@@ -84,8 +84,6 @@ func _ready():
 	update_torso_animation()
 	legs_sprite.connect("animation_finished", Callable(self, "_on_AnimationFinished"))
 	torso_sprite.connect("animation_finished", Callable(self, "_on_AnimationFinished"))
-	if get_parent() != null:
-		get_parent().global_transform = global_transform
 
 func _physics_process(delta):
 	apply_gravity(delta)
@@ -100,16 +98,6 @@ func _physics_process(delta):
 	# Check if player is falling and close to the floor
 	if is_jumping and velocity.y > 0 and is_close_to_floor():
 		legs_sprite.play("jump_down")  # Play the second half of the jump animation
-	
-	# Update parent transform without moving the child
-	if get_parent() != null:
-		var parent = get_parent()
-		#parent.global_transform.origin = global_transform.origin
-		#parent.rotation = global_transform.rotation
-		#parent.scale = global_transform.scale
-
-	# Reset child's velocity to prevent it from moving
-	CharacterBody2D.velocity = Vector2(0,0)
 
 func apply_gravity(delta):
 	if not is_on_floor():
