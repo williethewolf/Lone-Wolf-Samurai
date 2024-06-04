@@ -183,7 +183,17 @@ func perform_attack(attack_stance) -> void:
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
 	var penalty_duration = stance_penalty_duration
-	if current_stance != attack_stance || stance_button_held:
+	
+	if current_stance == "Mid" and attack_stance == "Mid":
+		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
+		if is_midSwing_complete:
+				torso_sprite.play("stance" + "Mid2")
+		else:
+				torso_sprite.play("stance" + "Mid1")
+		stance_change_cooldown = true  # Start stance change cooldown
+		await get_tree().create_timer(penalty_duration).timeout
+		stance_change_cooldown = false 
+	elif current_stance != attack_stance or stance_button_held:
 		if attack_stance == "Mid":
 			penalty_duration *= 0.5  # Reduce penalty by 50% for mid stance
 		next_stance = attack_stance

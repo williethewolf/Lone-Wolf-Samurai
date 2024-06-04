@@ -1,10 +1,24 @@
-[gd_scene load_steps=3 format=3 uid="uid://c74jtlkki0up6"]
+[gd_scene load_steps=4 format=3 uid="uid://c74jtlkki0up6"]
 
 [ext_resource type="Script" path="res://scripts/PlayerScripts/player1.gd" id="1_lfuv6"]
 [ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="2_5y1v4"]
+[ext_resource type="Script" path="res://scripts/Camera2D.gd" id="3_33wju"]
 
 [node name="Player1" type="Node2D"]
 script = ExtResource("1_lfuv6")
 character_path = NodePath("character")
 
 [node name="character" parent="." instance=ExtResource("2_5y1v4")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_smoothed = true
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.1
+drag_top_margin = 0.51
+drag_right_margin = 0.1
+editor_draw_drag_margin = true
+script = ExtResource("3_33wju")
+player_path = NodePath("..")
