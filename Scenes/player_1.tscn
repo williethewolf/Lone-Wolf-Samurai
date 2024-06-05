@@ -10,7 +10,7 @@ character_path = NodePath("character")
 
 [node name="character" parent="." instance=ExtResource("2_5y1v4")]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D2" type="Camera2D" parent="character"]
 limit_smoothed = true
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
@@ -21,4 +21,5 @@ drag_top_margin = 0.51
 drag_right_margin = 0.1
 editor_draw_drag_margin = true
 script = ExtResource("3_33wju")
-player_path = NodePath("..")
+
+[connection signal="grounded_updated" from="character" to="character/Camera2D2" method="_on_character_grounded_updated"]

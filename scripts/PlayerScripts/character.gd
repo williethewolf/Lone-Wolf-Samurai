@@ -118,7 +118,7 @@ func jump():
 func is_close_to_floor() -> bool:
 	return position.y + 10 >= floor_y_position  # Adjust this threshold as needed
 
-func handle_jump(delta):
+func handle_jump(_delta):
 	if is_on_floor():
 		is_jumping = false
 		velocity.y = 0
@@ -189,7 +189,7 @@ func perform_attack(attack_stance) -> void:
 		if is_midSwing_complete:
 				torso_sprite.play("stance" + "Mid2")
 		else:
-				torso_sprite.play("stance" + "Mid1")
+				torso_sprite.play("stance" + "Mid")
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
 		stance_change_cooldown = false 
@@ -300,9 +300,9 @@ func print_debug(message: String):
 	print(message)
 
 # Additional function to debug the is_midSwing_complete state
-func _process(delta):
+func _process(_delta):
 	#print("is_jumping:", is_jumping)
 	pass
 
-func _on_grounded_updated(is_jumping):
-	pass # Replace with function body.
+#func _on_grounded_updated(is_jumping):
+	#pass # Replace with function body.

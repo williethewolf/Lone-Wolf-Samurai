@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bncxcmigu4lac"]
+[gd_scene load_steps=9 format=3 uid="uid://bncxcmigu4lac"]
 
 [ext_resource type="Script" path="res://scripts/gameManager.gd" id="1_x53j0"]
 [ext_resource type="Texture2D" uid="uid://c7pd2sj7ykjd0" path="res://sprites/Building sprites/tilesettry1.png" id="2_3h48j"]
@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://bt4dxfnrnhq07" path="res://sprites/Building sprites/minka1.png" id="5_7u553"]
 [ext_resource type="Texture2D" uid="uid://c6wc4821h0k8a" path="res://sprites/Building sprites/minka2.png" id="6_dg1ui"]
 [ext_resource type="PackedScene" uid="uid://c74jtlkki0up6" path="res://Scenes/player_1.tscn" id="6_pju4e"]
-[ext_resource type="Script" path="res://scripts/Camera2D.gd" id="6_ucpp8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pjx3a"]
 texture = ExtResource("2_3h48j")
@@ -673,15 +672,3 @@ scale = Vector2(2.282, 2.282)
 texture = ExtResource("6_dg1ui")
 
 [node name="Player1" parent="." instance=ExtResource("6_pju4e")]
-
-[node name="Camera2D" type="Camera2D" parent="."]
-limit_smoothed = true
-position_smoothing_enabled = true
-position_smoothing_speed = 6.0
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-drag_left_margin = 0.1
-drag_top_margin = 0.51
-drag_right_margin = 0.1
-editor_draw_drag_margin = true
-script = ExtResource("6_ucpp8")

@@ -3,7 +3,7 @@ extends Node2D
 @export var character_path: NodePath = NodePath("")
 var character: Character
 
-@onready var camera = $Camera2D
+#@onready var camera = $Camera2D
 
 func _ready():
 	character = get_node(character_path) as Character
@@ -13,13 +13,13 @@ func _ready():
 		set_process(true)
 		character.player_name = "Player1"
 		# Connect the grounded_updated signal to the camera
-		if camera and not character.is_connected("grounded_updated", Callable(camera, "_on_grounded_updated")):
-			character.connect("grounded_updated", Callable(camera, "_on_grounded_updated"))
+		#if camera and not character.is_connected("grounded_updated", Callable(camera, "_on_grounded_updated")):
+			#character.connect("grounded_updated", Callable(camera, "_on_grounded_updated"))
 
-func _process(delta):
+func _process(_delta):
 	if character:
 		handle_input()
-		print("coordenates", transform)
+		#print("coordenates", transform)
 
 func handle_input():
 	character.direction = Vector2.ZERO
