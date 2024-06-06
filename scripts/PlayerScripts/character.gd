@@ -68,7 +68,7 @@ var stance_change_cooldown = false
 # Animation lengths (assuming these values are correct, adjust if necessary)
 var animation_lengths = {
 	"Top": 0.18,  # Top attack animation length
-	"Mid": 0.15,  # Mid attack animation length
+	"Mid": 0.18,  # Mid attack animation length
 	"Low": 0.18,  # Low attack animation length
 }
 
@@ -78,7 +78,7 @@ var attack_start_time = 0.0
 #for camera help
 signal grounded_updated (is_jumping)
 #this passes the transform to the parent so the camera can be there.
-signal transform_changed(new_transform)
+#signal transform_changed(new_transform)
 
 func _ready():
 	set_process(true)

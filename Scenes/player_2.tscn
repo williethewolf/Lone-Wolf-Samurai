@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bepmiy1cu1ar5"]
+[gd_scene load_steps=4 format=3 uid="uid://bepmiy1cu1ar5"]
 
 [ext_resource type="Script" path="res://scripts/PlayerScripts/player2.gd" id="1_4rnb5"]
 [ext_resource type="Resource" uid="uid://7qyvr7oqdl16" path="res://Scenes/player_2_controls.tres" id="2_10rmp"]
 [ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="2_gk4bp"]
-[ext_resource type="Script" path="res://scripts/camera2D.gd" id="3_a1xxc"]
 
 [node name="Player2" type="Node2D"]
 z_index = 1
@@ -12,18 +11,5 @@ character_path = NodePath("character")
 controls = ExtResource("2_10rmp")
 
 [node name="character" parent="." instance=ExtResource("2_gk4bp")]
+player_name = "player2"
 controls = ExtResource("2_10rmp")
-
-[node name="Camera2D2" type="Camera2D" parent="character"]
-limit_smoothed = true
-position_smoothing_enabled = true
-position_smoothing_speed = 6.0
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-drag_left_margin = 0.1
-drag_top_margin = 0.51
-drag_right_margin = 0.1
-editor_draw_drag_margin = true
-script = ExtResource("3_a1xxc")
-
-[connection signal="grounded_updated" from="character" to="character/Camera2D2" method="_on_character_grounded_updated"]

@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://cdtb0ukw3wbej" path="res://sprites/Character_sprites/bottom idle sheet.png" id="10_lhn33"]
 [ext_resource type="Texture2D" uid="uid://dq0kjgnbknt0g" path="res://sprites/Character_sprites/upper body idle mid anim_sheet.png" id="11_v4o5l"]
 [ext_resource type="Texture2D" uid="uid://ceg7v7kg6vxsl" path="res://sprites/Character_sprites/top idle.png" id="12_4xksj"]
-[ext_resource type="Script" path="res://scripts/camera2D.gd" id="13_5xno6"]
+[ext_resource type="Script" path="res://scripts/JumpCamera.gd" id="13_bhphk"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
 radius = 39.25
@@ -815,7 +815,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack2",
-"speed": 45.0
+"speed": 39.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -841,7 +841,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack22",
-"speed": 40.0
+"speed": 39.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -975,9 +975,10 @@ animation = &"idle_legs"
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
 sprite_frames = SubResource("SpriteFrames_k50ex")
-animation = &"attack22"
+animation = &"attack2"
 
 [node name="Camera2D" type="Camera2D" parent="."]
+enabled = false
 limit_smoothed = true
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
@@ -987,4 +988,4 @@ drag_left_margin = 0.1
 drag_top_margin = 0.51
 drag_right_margin = 0.1
 editor_draw_drag_margin = true
-script = ExtResource("13_5xno6")
+script = ExtResource("13_bhphk")

@@ -1,15 +1,48 @@
 extends Node2D
 
-@onready var player1 = $Player1
-@onready var camera1 = $Player1/character/Camera2D
-@onready var player2 =  get_node_or_null("Player2")
-@onready var camera2 = get_node_or_null("Player2/character/Camera2D")
-@onready var twoPlayerCamera = get_node_or_null("twoPlayerCamera")
+@onready var distance = 0
+@onready var twoPlayerCamera = get_node_or_null("HBoxContainer/SubViewportContainer3/SubViewport/Player2Camera")
+@onready var level = $HBoxContainer/SubViewportContainer/SubViewport/Level/Map/TileMap
+
+
+#I NEED TO UPDATE THIS USING GROUPS INSTEAD OF HARDCODED PATHS
+@onready var players := {
+	"1":{
+		viewport = $HBoxContainer/SubViewportContainer/SubViewport,
+		camera = $HBoxContainer/SubViewportContainer/SubViewport/Player1Camera,
+		player = $HBoxContainer/SubViewportContainer/SubViewport/Level/Players/Player1,
+		},
+	"2":{
+		viewport = $HBoxContainer/SubViewportContainer2/SubViewport,
+		camera = $HBoxContainer/SubViewportContainer2/SubViewport/Player2Camera,
+		player = get_node_or_null("HBoxContainer/SubViewportContainer/SubViewport/Level/Players/Player2"),
+		},
+}
 
 func _ready():
-	if player1 and camera1:
-		camera1.make_current()
-	elif player1 and player2:
-		pass
-	elif player2 == null:
-		print("No player 2. Single player game")
+	if players["2"].player:
+		players["2"].viewport.world_2d = players["1"].viewport.world_2d
+		for node in players.values():
+			var remote_transform := RemoteTransform2D.new()
+			remote_transform.remote_path = node.camera.get_path()
+			node.player.get_node("character").add_child(remote_transform)
+			if node.player.get_node("character").has_signal("grounded_updated"):
+				node.player.get_node("character").connect("grounded_updated", Callable(node.camera, "_on_grounded_updated"))
+			#add players to the twoplayerCamera - POSSIBLY OBSOLETE AFTER USING GROUPS TO ITERATE
+			#$HBoxContainer/SubViewportContainer2/SubViewport/TwoPlayerCamera.add_target($HBoxContainer/SubViewportContainer/SubViewport/TestMap/Player1)
+			#$HBoxContainer/SubViewportContainer2/SubViewport/TwoPlayerCamera.add_target($HBoxContainer/SubViewportContainer/SubViewport/TestMap/Player2)
+			var tilemapBoundries = level.get_used_rect()
+			#$SubViewportContainer3/SubViewport/MultiplayerCamera.limit_left = tilemapBoundries.tile_set.tile_size.x
+			#$SubViewportContainer3/SubViewport/MultiplayerCamera.limit_right = tilemapBoundries.tile_set.tile_size.x
+			#$SubViewportContainer3/SubViewport/MultiplayerCamera.limit_bottom = tilemapBoundries.endtile_set.tile_size.y
+func _physics_process(_delta):
+	if players["2"].player:
+		distance = players["1"].player.get_node("character").position.distance_to(players["2"].player.get_node("character").position)
+		if distance <= 700:
+			# Switch to the combined camera
+			print("They are close")
+			#$SubViewportContainer3/SubViewport/MultiplayerCamera.make_current()
+		else:
+			print("They are NOT close")
+			# Switch to split-screen cameras
+		

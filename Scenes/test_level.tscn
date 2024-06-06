@@ -1,14 +1,14 @@
-[gd_scene load_steps=9 format=3 uid="uid://bncxcmigu4lac"]
+[gd_scene load_steps=9 format=3 uid="uid://bb3wvexddf8t"]
 
-[ext_resource type="Script" path="res://scripts/Camera2D.gd" id="2_0mxq0"]
-[ext_resource type="Texture2D" uid="uid://c7pd2sj7ykjd0" path="res://sprites/Building sprites/tilesettry1.png" id="2_3h48j"]
-[ext_resource type="Texture2D" uid="uid://bwonwaq3grd6w" path="res://sprites/Building sprites/japanBackgropund1.png" id="4_ukgbu"]
-[ext_resource type="Texture2D" uid="uid://bt4dxfnrnhq07" path="res://sprites/Building sprites/minka1.png" id="5_7u553"]
-[ext_resource type="Texture2D" uid="uid://c6wc4821h0k8a" path="res://sprites/Building sprites/minka2.png" id="6_dg1ui"]
-[ext_resource type="PackedScene" uid="uid://c74jtlkki0up6" path="res://Scenes/player_1.tscn" id="6_pju4e"]
+[ext_resource type="Texture2D" uid="uid://c7pd2sj7ykjd0" path="res://sprites/Building sprites/tilesettry1.png" id="1_a74yq"]
+[ext_resource type="PackedScene" uid="uid://c74jtlkki0up6" path="res://Scenes/player_1.tscn" id="1_nvc63"]
+[ext_resource type="Texture2D" uid="uid://bwonwaq3grd6w" path="res://sprites/Building sprites/japanBackgropund1.png" id="2_i10jy"]
+[ext_resource type="Texture2D" uid="uid://bt4dxfnrnhq07" path="res://sprites/Building sprites/minka1.png" id="3_ab5g3"]
+[ext_resource type="Texture2D" uid="uid://c6wc4821h0k8a" path="res://sprites/Building sprites/minka2.png" id="4_alwnp"]
+[ext_resource type="PackedScene" uid="uid://bepmiy1cu1ar5" path="res://Scenes/player_2.tscn" id="6_a0xtt"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pjx3a"]
-texture = ExtResource("2_3h48j")
+texture = ExtResource("1_a74yq")
 margins = Vector2i(2, 2)
 texture_region_size = Vector2i(25, 15)
 0:4/0 = 0
@@ -623,16 +623,25 @@ texture_region_size = Vector2i(25, 15)
 2:6/0/physics_layer_1/linear_velocity = Vector2(0, 0)
 2:6/0/physics_layer_1/angular_velocity = 0.0
 
-[sub_resource type="TileSet" id="TileSet_26cv0"]
+[sub_resource type="TileSet" id="TileSet_8rsmn"]
 physics_layer_0/collision_layer = 1
 physics_layer_1/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_pjx3a")
 
-[node name="Game" type="Node2D"]
+[node name="Level" type="Node2D"]
 
-[node name="TileMap" type="TileMap" parent="."]
+[node name="Players" type="Node2D" parent="."]
+
+[node name="Player1" parent="Players" groups=["Players"] instance=ExtResource("1_nvc63")]
+
+[node name="Player2" parent="Players" groups=["Players"] instance=ExtResource("6_a0xtt")]
+position = Vector2(250, 0)
+
+[node name="Map" type="Node2D" parent="."]
+
+[node name="TileMap" type="TileMap" parent="Map"]
 position = Vector2(-3, -13)
-tile_set = SubResource("TileSet_26cv0")
+tile_set = SubResource("TileSet_8rsmn")
 format = 2
 layer_0/name = "Vis_Platforms"
 layer_0/modulate = Color(0.579691, 0.579691, 0.579691, 1)
@@ -649,37 +658,23 @@ layer_3/tile_data = PackedInt32Array()
 layer_4/name = "Paralax Background"
 layer_4/tile_data = PackedInt32Array()
 
-[node name="JapanBackgropund1" type="Sprite2D" parent="."]
+[node name="JapanBackgropund1" type="Sprite2D" parent="Map"]
 modulate = Color(0.487009, 0.487009, 0.487009, 1)
 z_index = -531
 position = Vector2(1212, -257)
 scale = Vector2(2.27778, 2.27778)
-texture = ExtResource("4_ukgbu")
+texture = ExtResource("2_i10jy")
 
-[node name="Minka1" type="Sprite2D" parent="."]
+[node name="Minka1" type="Sprite2D" parent="Map"]
 modulate = Color(0.487009, 0.487009, 0.487009, 1)
 z_index = -365
 position = Vector2(-63.5, -115.5)
 scale = Vector2(2.29, 2.29)
-texture = ExtResource("5_7u553")
+texture = ExtResource("3_ab5g3")
 
-[node name="Minka2" type="Sprite2D" parent="."]
+[node name="Minka2" type="Sprite2D" parent="Map"]
 modulate = Color(0.487009, 0.487009, 0.487009, 1)
 z_index = -365
 position = Vector2(987, -156)
 scale = Vector2(2.282, 2.282)
-texture = ExtResource("6_dg1ui")
-
-[node name="Player1" parent="." instance=ExtResource("6_pju4e")]
-
-[node name="Camera2D" type="Camera2D" parent="Player1"]
-limit_smoothed = true
-position_smoothing_enabled = true
-position_smoothing_speed = 6.0
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-drag_left_margin = 0.1
-drag_top_margin = 0.51
-drag_right_margin = 0.1
-editor_draw_drag_margin = true
-script = ExtResource("2_0mxq0")
+texture = ExtResource("4_alwnp")

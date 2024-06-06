@@ -14,7 +14,7 @@ func _ready():
 		set_process(true)
 		character.player_name = "Player2"
 
-func _process(delta):
+func _process(_delta):
 	if character:
 		handle_input()
 
