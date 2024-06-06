@@ -18,6 +18,8 @@ var current_stance = "Mid"
 # Constants for movement and controls
 const LEFT = Vector2(-1, 0)
 const RIGHT = Vector2(1, 0)
+#Multiplayer coop control variables
+@export var controls: Resource = null
 
 # Jump properties
 @export var jump_height: float = 200.0  # Jump height in pixels
@@ -144,19 +146,19 @@ func handle_stance_change():
 	
 	stance_button_held = false
 	
-	if Input.is_action_pressed("stance_top"):
+	if Input.is_action_pressed(controls.stance_top):
 		stance_button_held = true
 		if current_stance != "Top":
 			change_stance("Top")
-	elif Input.is_action_pressed("stance_low"):
+	elif Input.is_action_pressed(controls.stance_low):
 		stance_button_held = true
 		if current_stance != "Low":
 			change_stance("Low")
-	elif Input.is_action_pressed("ui_right") and facing == RIGHT:
+	elif Input.is_action_pressed(controls.stance_mid) and facing == RIGHT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
-	elif Input.is_action_pressed("ui_left") and facing == LEFT:
+	elif Input.is_action_pressed(controls.stance_midL) and facing == LEFT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
@@ -168,11 +170,11 @@ func handle_attacks():
 	if attack_cooldown:
 		return  # Prevent attacks during cooldown
 	
-	if Input.is_action_just_pressed("attack_top"):
+	if Input.is_action_just_pressed(controls.attack_top):
 		perform_attack("Top")
-	elif Input.is_action_just_pressed("attack_mid"):
+	elif Input.is_action_just_pressed(controls.attack_mid):
 		perform_attack("Mid")
-	elif Input.is_action_just_pressed("attack_low"):
+	elif Input.is_action_just_pressed(controls.attack_low):
 		perform_attack("Low")
 
 func perform_attack(attack_stance) -> void:

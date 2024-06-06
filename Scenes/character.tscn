@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://cdtb0ukw3wbej" path="res://sprites/Character_sprites/bottom idle sheet.png" id="10_lhn33"]
 [ext_resource type="Texture2D" uid="uid://dq0kjgnbknt0g" path="res://sprites/Character_sprites/upper body idle mid anim_sheet.png" id="11_v4o5l"]
 [ext_resource type="Texture2D" uid="uid://ceg7v7kg6vxsl" path="res://sprites/Character_sprites/top idle.png" id="12_4xksj"]
-[ext_resource type="Script" path="res://scripts/Camera2D.gd" id="13_1ns4g"]
+[ext_resource type="Script" path="res://scripts/camera2D.gd" id="13_5xno6"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
 radius = 39.25
@@ -987,4 +987,4 @@ drag_left_margin = 0.1
 drag_top_margin = 0.51
 drag_right_margin = 0.1
 editor_draw_drag_margin = true
-script = ExtResource("13_1ns4g")
+script = ExtResource("13_5xno6")
