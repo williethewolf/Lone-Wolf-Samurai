@@ -3,6 +3,13 @@ extends Node2D
 @onready var distance = 0
 @onready var twoPlayerCamera = get_node_or_null("HBoxContainer/SubViewportContainer3/SubViewport/Player2Camera")
 @onready var level = $HBoxContainer/SubViewportContainer/SubViewport/Level/Map/TileMap
+@onready var floorLine = $HBoxContainer/SubViewportContainer/SubViewport/Level/Map/Floorline
+
+var floorLineCoords := 0
+var distanceToFloorline
+
+signal distance_to_floor(distance_to_floorline)
+
 
 
 #I NEED TO UPDATE THIS USING GROUPS INSTEAD OF HARDCODED PATHS
@@ -19,7 +26,10 @@ extends Node2D
 		},
 }
 
+
+
 func _ready():
+	floorLineCoords = floorLine.position.y
 	if players["2"].player:
 		players["2"].viewport.world_2d = players["1"].viewport.world_2d
 		for node in players.values():
@@ -44,5 +54,8 @@ func _physics_process(_delta):
 			#$SubViewportContainer3/SubViewport/MultiplayerCamera.make_current()
 		else:
 			print("They are NOT close")
-			# Switch to split-screen cameras
+			# Calculate distance to adjsut camera offset
+	for node in players.values():
+		distanceToFloorline = abs(node.player.get_node("character").position.y - floorLineCoords)
+		node.camera._update_camera_offset(distanceToFloorline)
 		
