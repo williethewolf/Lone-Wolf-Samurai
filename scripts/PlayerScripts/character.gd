@@ -269,6 +269,7 @@ func update_torso_animation():
 			torso_sprite.play(new_animation)
 
 func update_animation():
+	var threshold = 0.01  # Define a small threshold for velocity
 	if is_jumping:
 		# Ensure the correct part of the jump animation is playing
 		if velocity.y < 0:
@@ -277,11 +278,15 @@ func update_animation():
 			legs_sprite.play("jump_down")
 	elif is_dashing:
 		legs_sprite.play("dash")
-	elif direction != Vector2.ZERO and is_on_floor():
+	elif direction != Vector2.ZERO and is_on_floor() and velocity.length() >= threshold:
+		# Calculate the animation speed based on the velocity
+		var speed_scale = velocity.length() / speed
+		legs_sprite.speed_scale = max(speed_scale, 0.1)  # Ensure a minimum speed scale
+		
 		if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
-			legs_sprite.speed_scale = -1  # Play animation in reverse
+			legs_sprite.speed_scale *= -1  # Play animation in reverse
 		else:
-			legs_sprite.speed_scale = 1  # Play animation normally
+			legs_sprite.speed_scale *= 1  # Play animation normally
 		legs_sprite.play("walk")
 	else:
 		update_leg_animation()
@@ -290,9 +295,11 @@ func update_animation():
 		update_torso_animation()
 
 func update_leg_animation():
+	var threshold = 0.01  # Define a small threshold for velocity
+
 	if is_jumping:
 		legs_sprite.play("jump_up")
-	elif direction == Vector2.ZERO:
+	elif direction == Vector2.ZERO or velocity.length() < threshold:
 		legs_sprite.play("idle_legs")  # Ensure legs go back to idle when not moving
 	else:
 		if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
