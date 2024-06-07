@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PlayerControls" load_steps=2 format=3 uid="uid://7qyvr7oqdl16"]
+
+[ext_resource type="Script" path="res://scripts/PlayerScripts/playerControls.gd" id="1_n1y8r"]
+
+[resource]
+script = ExtResource("1_n1y8r")
+player_index = 0
+move_left = "p2_move_left"
+move_right = "p2_move_right"
+jump = "p2_jump"
+stance_top = "p2_stanceTop"
+attack_top = "p2_attackTop"
+stance_mid = "p2_stanceMid"
+stance_midL = "p2_stanceMidL"
+attack_mid = "p2_attackMid"
+stance_low = "p2_stanceLow"
+attack_low = "p2_attackLow"
+dash = "p2_dash"

@@ -18,6 +18,8 @@ var current_stance = "Mid"
 # Constants for movement and controls
 const LEFT = Vector2(-1, 0)
 const RIGHT = Vector2(1, 0)
+#Multiplayer coop control variables
+@export var controls: Resource = null
 
 # Jump properties
 @export var jump_height: float = 200.0  # Jump height in pixels
@@ -66,7 +68,7 @@ var stance_change_cooldown = false
 # Animation lengths (assuming these values are correct, adjust if necessary)
 var animation_lengths = {
 	"Top": 0.18,  # Top attack animation length
-	"Mid": 0.15,  # Mid attack animation length
+	"Mid": 0.18,  # Mid attack animation length
 	"Low": 0.18,  # Low attack animation length
 }
 
@@ -76,7 +78,7 @@ var attack_start_time = 0.0
 #for camera help
 signal grounded_updated (is_jumping)
 #this passes the transform to the parent so the camera can be there.
-signal transform_changed(new_transform)
+#signal transform_changed(new_transform)
 
 func _ready():
 	set_process(true)
@@ -118,7 +120,7 @@ func jump():
 func is_close_to_floor() -> bool:
 	return position.y + 10 >= floor_y_position  # Adjust this threshold as needed
 
-func handle_jump(delta):
+func handle_jump(_delta):
 	if is_on_floor():
 		is_jumping = false
 		velocity.y = 0
@@ -144,19 +146,19 @@ func handle_stance_change():
 	
 	stance_button_held = false
 	
-	if Input.is_action_pressed("stance_top"):
+	if Input.is_action_pressed(controls.stance_top):
 		stance_button_held = true
 		if current_stance != "Top":
 			change_stance("Top")
-	elif Input.is_action_pressed("stance_low"):
+	elif Input.is_action_pressed(controls.stance_low):
 		stance_button_held = true
 		if current_stance != "Low":
 			change_stance("Low")
-	elif Input.is_action_pressed("ui_right") and facing == RIGHT:
+	elif Input.is_action_pressed(controls.stance_mid) and facing == RIGHT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
-	elif Input.is_action_pressed("ui_left") and facing == LEFT:
+	elif Input.is_action_pressed(controls.stance_midL) and facing == LEFT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
@@ -168,11 +170,11 @@ func handle_attacks():
 	if attack_cooldown:
 		return  # Prevent attacks during cooldown
 	
-	if Input.is_action_just_pressed("attack_top"):
+	if Input.is_action_just_pressed(controls.attack_top):
 		perform_attack("Top")
-	elif Input.is_action_just_pressed("attack_mid"):
+	elif Input.is_action_just_pressed(controls.attack_mid):
 		perform_attack("Mid")
-	elif Input.is_action_just_pressed("attack_low"):
+	elif Input.is_action_just_pressed(controls.attack_low):
 		perform_attack("Low")
 
 func perform_attack(attack_stance) -> void:
@@ -183,7 +185,17 @@ func perform_attack(attack_stance) -> void:
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
 	var penalty_duration = stance_penalty_duration
-	if current_stance != attack_stance || stance_button_held:
+	
+	if current_stance == "Mid" and attack_stance == "Mid":
+		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
+		if is_midSwing_complete:
+				torso_sprite.play("stance" + "Mid2")
+		else:
+				torso_sprite.play("stance" + "Mid")
+		stance_change_cooldown = true  # Start stance change cooldown
+		await get_tree().create_timer(penalty_duration).timeout
+		stance_change_cooldown = false 
+	elif current_stance != attack_stance or stance_button_held:
 		if attack_stance == "Mid":
 			penalty_duration *= 0.5  # Reduce penalty by 50% for mid stance
 		next_stance = attack_stance
@@ -290,9 +302,9 @@ func print_debug(message: String):
 	print(message)
 
 # Additional function to debug the is_midSwing_complete state
-func _process(delta):
+func _process(_delta):
 	#print("is_jumping:", is_jumping)
 	pass
 
-func _on_grounded_updated(is_jumping):
-	pass # Replace with function body.
+#func _on_grounded_updated(is_jumping):
+	#pass # Replace with function body.
