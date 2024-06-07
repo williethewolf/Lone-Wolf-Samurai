@@ -10,7 +10,7 @@ var stance = ["Top", "Mid", "Low"]
 var current_stance = "Mid"
 @export var player_name: String = "player1"
 @export var weapon: String = "katana"
-@export var speed: float = 300.0  # Adjusted speed
+@export var speed: float = 400.0  # Adjusted speed
 @export var player_height: float = 175.0  # Player height in centimeters (1.75 meters)
 @export var stance_penalty_duration: float = 0.5  # Penalty duration in seconds
 @export var stanceChangeCooldown: float = 0.2  # Cooldown for changing stances
@@ -23,8 +23,10 @@ const RIGHT = Vector2(1, 0)
 
 # Jump properties
 @export var jump_height: float = 200.0  # Jump height in pixels
-@export var gravity: float = 2500.0  # Increased gravity strength
-@export var jump_speed: float = -1000.0  # Increased initial jump speed (more negative to move up faster)
+@export var min_jump_height: float = 50.0  # Minimum jump height in pixels
+@export var gravity: float = 5500.0  # Increased gravity strength
+@export var jump_speed: float = -1500.0  # Increased initial jump speed (more negative to move up faster)
+@export var jump_duration: float = 0.3  # Duration to reach full jump height
 var floor_y_position: float = 10
 
 # Movement variables
@@ -39,6 +41,7 @@ var dash_timer = 0
 
 # Jump variables
 var is_jumping = false
+
 
 # Unseath variables
 var sword_sheathed = true
@@ -95,7 +98,7 @@ func _physics_process(delta):
 	if is_jumping:
 		handle_jump(delta)
 	
-	update_animation()  # Ensure this is called every frame
+	update_animation()  # This is called every frame to update anims
 
 	# Check if player is falling and close to the floor
 	if is_jumping and velocity.y > 0 and is_close_to_floor():

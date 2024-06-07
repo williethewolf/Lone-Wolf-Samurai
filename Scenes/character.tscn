@@ -478,7 +478,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"jump_down",
-"speed": 5.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -507,7 +507,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"jump_up",
-"speed": 5.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -970,7 +970,7 @@ shape = SubResource("CapsuleShape2D_58rqj")
 [node name="AnimatedSprite2DLegs" type="AnimatedSprite2D" parent="."]
 position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_c6t04")
-animation = &"idle_legs"
+animation = &"jump"
 
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
