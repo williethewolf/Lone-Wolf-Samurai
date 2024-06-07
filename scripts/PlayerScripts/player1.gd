@@ -15,18 +15,14 @@ var jump_duration: float = 0.05  # Duration to reach full jump height
 func _ready():
 	character = get_node(character_path) as Character
 	if not character:
-		print("Character node not found!")
+		print("Player 1 node not found!")
 	else:
 		set_process(true)
 		character.player_name = "Player1"
-		# Connect the grounded_updated signal to the camera
-		#if camera and not character.is_connected("grounded_updated", Callable(camera, "_on_grounded_updated")):
-			#character.connect("grounded_updated", Callable(camera, "_on_grounded_updated"))
 
 func _process(_delta):
 	if character:
 		handle_input()
-		#print("coordenates", transform)
 
 func handle_input():
 	character.direction = Vector2.ZERO
@@ -62,6 +58,3 @@ func handle_input():
 
 	character.handle_stance_change()
 	character.handle_attacks()
-	
-func print_debug(message: String):
-	print(message)
