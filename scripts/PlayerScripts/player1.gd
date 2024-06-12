@@ -5,6 +5,7 @@ var character: Character
 
 #Multiplayer coop control variables
 @export var controls: Resource = null
+@export var player_number: int = 1
 
 #Jumping vars
 @export var jump_height: float = 200.0  # Jump height in pixels
@@ -15,10 +16,12 @@ var jump_duration: float = 0.05  # Duration to reach full jump height
 func _ready():
 	character = get_node(character_path) as Character
 	if not character:
-		print("Player 1 node not found!")
+		print("Player " + str(player_number) + " node not found!")
 	else:
 		set_process(true)
-		character.player_name = "Player1"
+		character.player_name = "Player" + str(player_number)
+	#makes sure it is part of the players group
+	add_to_group("players")
 
 func _process(_delta):
 	if character:

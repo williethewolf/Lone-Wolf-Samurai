@@ -3,7 +3,7 @@ extends Camera2D
 # Variables for smoothing
 var target_offset_y = -150.0
 var offset_smoothing_speed = 3.50  # Adjust this value to control the smoothing speed
-var is_jumping = false  # Variable to track the jumping state
+var is_jumping_state = false  # Variable to track the jumping state
 
 # This function is called when the node enters the scene tree for the first time.
 func _ready():
@@ -11,14 +11,14 @@ func _ready():
 
 func _process(delta):
 	# Smoothly interpolate towards the target offset
-	if not is_jumping:  # Only update the offset if not jumping
+	if not is_jumping_state:  # Only update the offset if not jumping
 		offset.y = lerp(offset.y, target_offset_y, offset_smoothing_speed * delta)
 
 # This function is called when the grounded_updated signal is emitted.
-func _on_grounded_updated(is_jumping):
-	drag_vertical_enabled = is_jumping
-	self.is_jumping = is_jumping  # Update the jumping state
-	print("is_jumping:", is_jumping)
+func _on_grounded_updated(jumping_state):
+	drag_vertical_enabled = jumping_state
+	is_jumping_state = jumping_state  # Update the jumping state
+	print("is_jumping:", is_jumping_state)
 	print("drag_vertical_enabled:", drag_vertical_enabled)
 
 # For debugging

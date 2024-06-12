@@ -24,28 +24,25 @@ size = Vector2i(1280, 720)
 render_target_update_mode = 4
 
 [node name="MultiplayerCamera" type="Camera2D" parent="SubViewportContainer3/SubViewport"]
-enabled = false
 script = ExtResource("3_e4bsi")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="HBoxContainer"]
+[node name="SubViewportContainer1" type="SubViewportContainer" parent="HBoxContainer"]
 layout_mode = 2
 
-[node name="SubViewport" type="SubViewport" parent="HBoxContainer/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="HBoxContainer/SubViewportContainer1"]
 handle_input_locally = false
 size = Vector2i(640, 720)
 render_target_update_mode = 4
 
-[node name="Level" parent="HBoxContainer/SubViewportContainer/SubViewport" instance=ExtResource("4_cbbi2")]
+[node name="Level" parent="HBoxContainer/SubViewportContainer1/SubViewport" instance=ExtResource("4_cbbi2")]
 position = Vector2(100, 0)
 
-[node name="Player1Camera" type="Camera2D" parent="HBoxContainer/SubViewportContainer/SubViewport"]
-position = Vector2(100, 0)
+[node name="Player1Camera" type="Camera2D" parent="HBoxContainer/SubViewportContainer1/SubViewport"]
 position_smoothing_enabled = true
-position_smoothing_speed = 3.0
 script = ExtResource("4_clkf2")
 
 [node name="SubViewportContainer2" type="SubViewportContainer" parent="HBoxContainer"]
@@ -58,5 +55,4 @@ render_target_update_mode = 4
 
 [node name="Player2Camera" type="Camera2D" parent="HBoxContainer/SubViewportContainer2/SubViewport"]
 position_smoothing_enabled = true
-position_smoothing_speed = 3.0
 script = ExtResource("4_clkf2")
