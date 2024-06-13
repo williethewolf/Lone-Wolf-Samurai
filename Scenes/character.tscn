@@ -15,7 +15,7 @@
 [ext_resource type="Script" path="res://scripts/JumpCamera.gd" id="13_bhphk"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
-radius = 39.25
+radius = 18.25
 height = 166.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dsqc8"]
