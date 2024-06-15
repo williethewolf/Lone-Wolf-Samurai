@@ -5,14 +5,23 @@ var character: Character
 
 #Multiplayer coop control variables
 @export var controls: Resource = null
+@export var player_number: int = 2
+
+#Jumping vars
+@export var jump_height: float = 200.0  # Jump height in pixels
+@export var min_jump_height: float = 20.0  # Minimum jump height in pixels
+var jump_pressed_duration = 0.0  # Duration for which the jump button is pressed
+var jump_duration: float = 0.05  # Duration to reach full jump height
 
 func _ready():
 	character = get_node(character_path) as Character
 	if not character:
-		print("Character 2 node not found!")
+		print("Player " + str(player_number) + " node not found!")
 	else:
 		set_process(true)
-		character.player_name = "Player2"
+		character.player_name = "Player" + str(player_number)
+	#Makes sure it is part of the players group
+	add_to_group("players")
 
 func _process(_delta):
 	if character:
@@ -44,6 +53,11 @@ func handle_input():
 
 	if Input.is_action_just_pressed(controls.jump) and character.is_on_floor():
 		character.jump()
+	elif Input.is_action_just_released("jump") and character.is_jumping:
+		jump_pressed_duration = clamp(jump_pressed_duration, 0.0, jump_duration)
+		var jump_ratio = jump_pressed_duration / jump_duration
+		character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
+		#character.is_jumping = false
 
 	character.handle_stance_change()
 	character.handle_attacks()
