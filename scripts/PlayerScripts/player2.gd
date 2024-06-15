@@ -57,7 +57,7 @@ func handle_input():
 		jump_pressed_duration = clamp(jump_pressed_duration, 0.0, jump_duration)
 		var jump_ratio = jump_pressed_duration / jump_duration
 		character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
-		character.is_jumping = false
+		#character.is_jumping = false
 
 	character.handle_stance_change()
 	character.handle_attacks()

@@ -60,7 +60,7 @@ func lerp(a, b, t):
 	return a + (b - a) * t
 
 # This function handles the distance to floorline updates
-func _on_distance_to_floor(distance_to_floorline):
+func _on_distance_to_floor(_distance_to_floorline):
 	#disabled until I can figure out how to make it smooth and work fine with the two player camera
 	#_update_camera_offset(distance_to_floorline)
 	pass

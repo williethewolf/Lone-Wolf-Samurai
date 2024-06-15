@@ -41,7 +41,7 @@ var dash_timer = 0
 
 # Jump variables
 var is_jumping = false
-
+var is_falling = false
 
 # Unseath variables
 var sword_sheathed = true
@@ -57,10 +57,13 @@ var next_stance = ""
 var stance_button_held = false
 var is_midSwing_complete = false
 
+# Reference to the AnimationPlayer nodes
+@onready var animPlayer_legs = $LegsAnimationPlayer
+@onready var animPlayer_torso = $TorsoAnimationPlayer
+
 # Reference to the AnimatedSprite2D nodes
 @onready var legs_sprite = $AnimatedSprite2DLegs
 @onready var torso_sprite = $AnimatedSprite2DTorso
-
 # Current animation state
 var current_torso_animation = ""
 
@@ -85,63 +88,58 @@ signal grounded_updated (is_jumping)
 
 func _ready():
 	set_process(true)
-	legs_sprite.play("idle_legs")
+	animPlayer_legs.play("idle_legs")
 	update_torso_animation()
-	legs_sprite.connect("animation_finished", Callable(self, "_on_AnimationFinished"))
-	torso_sprite.connect("animation_finished", Callable(self, "_on_AnimationFinished"))
+	animPlayer_legs.connect("animation_finished", Callable(self, "_on_legs_animation_player_animation_finished"))
+	animPlayer_torso.connect("animation_finished", Callable(self, "_on_torso_animation_player_animation_finished"))
+
 
 func _physics_process(delta):
 	apply_gravity(delta)
 	velocity.x = direction.x * speed
 	move_and_slide()  # Move and slide the character based on velocity
 	
-	if is_jumping:
-		handle_jump(delta)
-	
-	update_animation()  # This is called every frame to update anims
+	handle_jump(delta)  # Always handle jumping
 
-	# Check if player is falling and close to the floor
-	if is_jumping and velocity.y > 0 and is_close_to_floor():
-		legs_sprite.play("jump_down")  # Play the second half of the jump animation
+	update_animation()  # This is called every frame to update animations
+
+
 
 func apply_gravity(delta):
 	if not is_on_floor():
 		velocity.y += gravity * delta
+	#print("Applying gravity: velocity.y =", velocity.y, "is_on_floor() =", is_on_floor())
 
 func dash():
 	is_dashing = true
 	dash_timer = dash_duration
 	velocity.x = facing.x * dash_speed
-	legs_sprite.play("dash")
+	animPlayer_legs.play("dash")
 
 func jump():
 	is_jumping = true
 	velocity.y = jump_speed  # Set the initial jump speed
-	legs_sprite.play("jump_up")  # Play the first half of the jump animation
+	animPlayer_legs.play("jump_up")  # Play the first half of the jump animation
 	emit_signal("grounded_updated", is_jumping)
 
 func is_close_to_floor() -> bool:
-	return position.y + 10 >= floor_y_position  # Adjust this threshold as needed
+	return position.y + 75 >= floor_y_position  # Adjust this threshold as needed
 
 func handle_jump(_delta):
+	# Check if the character is on the floor
 	if is_on_floor():
-		is_jumping = false
-		velocity.y = 0
-		legs_sprite.play("idle_legs")  # Ensure legs go back to idle after landing
-		emit_signal("grounded_updated", is_jumping)
+		#if is_jumping:  # Only change if it was previously jumping
+			is_jumping = false
+			#velocity.y = 0
+			#animPlayer_legs.play("idle_legs")
+			emit_signal("grounded_updated", is_jumping)
+			print_debug("Player on floor is_jumping:", is_jumping)
+	else:
+		print_debug("player not on floor is_jumping:", is_jumping)
+		#if not is_jumping:  # Only change if it was not previously jumping
+		is_jumping = true
+			#print("Jumping or falling: is_jumping:", is_jumping)
 
-func _on_AnimationFinished():
-	if is_attacking and (torso_sprite.animation == "attack1" or torso_sprite.animation == "attack2" or torso_sprite.animation == "attack3"):
-		is_attacking = false
-		# Change the stance only after the attack animation finishes
-		if next_stance != "":
-			current_stance = next_stance
-			next_stance = ""
-		update_torso_animation()
-	elif legs_sprite.animation == "jump":
-		is_jumping = false
-		update_leg_animation()
-	current_torso_animation = ""
 
 func handle_stance_change():
 	if stance_change_cooldown:
@@ -192,9 +190,9 @@ func perform_attack(attack_stance) -> void:
 	if current_stance == "Mid" and attack_stance == "Mid":
 		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
 		if is_midSwing_complete:
-				torso_sprite.play("stance" + "Mid2")
+			animPlayer_torso.play("stanceMid2")
 		else:
-				torso_sprite.play("stance" + "Mid")
+			animPlayer_torso.play("stanceMid")
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
 		stance_change_cooldown = false 
@@ -202,7 +200,7 @@ func perform_attack(attack_stance) -> void:
 		if attack_stance == "Mid":
 			penalty_duration *= 0.5  # Reduce penalty by 50% for mid stance
 		next_stance = attack_stance
-		torso_sprite.play("stance" + attack_stance)
+		animPlayer_torso.play("stance" + attack_stance)
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
 		stance_change_cooldown = false  # End stance change cooldown
@@ -211,18 +209,18 @@ func perform_attack(attack_stance) -> void:
 	attack_cooldown = true
 	if attack_stance == "Top":
 		next_stance = "Low"
-		torso_sprite.play("attack1")
+		animPlayer_torso.play("attack1")
 	elif attack_stance == "Mid":
 		if is_midSwing_complete:
-			torso_sprite.play("attack22")
+			animPlayer_torso.play("attack22")
 			is_midSwing_complete = false
 		else:
-			torso_sprite.play("attack2")
+			animPlayer_torso.play("attack2")
 			is_midSwing_complete = true
 		next_stance = "Mid"
 	elif attack_stance == "Low":
 		next_stance = "Top"
-		torso_sprite.play("attack3")
+		animPlayer_torso.play("attack3")
 
 	# Wait for the duration of the animation before allowing another attack
 	var attack_duration = animation_lengths[attack_stance]
@@ -238,7 +236,7 @@ func change_stance(new_stance: String):
 	unseathe_sword()
 	is_midSwing_complete= false
 	if is_attacking:
-		torso_sprite.stop()
+		animPlayer_torso.stop()
 		is_attacking = false
 	stance_change_cooldown = true  # Start stance change cooldown
 	await get_tree().create_timer(stanceChangeCooldown).timeout
@@ -266,50 +264,58 @@ func update_torso_animation():
 		# Only update animation if it's different from the current one
 		if new_animation != current_torso_animation:
 			current_torso_animation = new_animation
-			torso_sprite.play(new_animation)
+			animPlayer_torso.play(new_animation)
 
 func update_animation():
-	var threshold = 0.01  # Define a small threshold for velocity
-	if is_jumping:
-		# Ensure the correct part of the jump animation is playing
-		if velocity.y < 0:
-			legs_sprite.play("jump_up")
-		elif velocity.y > 0 and is_close_to_floor():
-			legs_sprite.play("jump_down")
-	elif is_dashing:
+	#var threshold = 0.01  # Define a small threshold for velocity
+	##print("Updating animation: is_jumping =", is_jumping)
+#
+	#if is_jumping:
+		#if velocity.y < 0:
+			#animPlayer_legs.play("jump_up")
+		#elif velocity.y > 0 and is_close_to_floor():
+			#animPlayer_legs.play("jump_down")
+	#elif direction == Vector2.ZERO or velocity.length() < threshold:
+		#animPlayer_legs.play("idle_legs")  # Ensure legs go back to idle when not moving
+	#else:
+		#if not is_jumping:
+			#if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
+				#animPlayer_legs.speed_scale = -1  # Play animation in reverse
+			#else:
+				#animPlayer_legs.speed_scale = 1  # Play animation normally
+			#animPlayer_legs.play("walk")
+	if is_dashing:
 		legs_sprite.play("dash")
-	elif direction != Vector2.ZERO and is_on_floor() and velocity.length() >= threshold:
-		# Calculate the animation speed based on the velocity
-		var speed_scale = velocity.length() / speed
-		legs_sprite.speed_scale = max(speed_scale, 0.1)  # Ensure a minimum speed scale
-		
-		if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
-			legs_sprite.speed_scale *= -1  # Play animation in reverse
-		else:
-			legs_sprite.speed_scale *= 1  # Play animation normally
-		legs_sprite.play("walk")
 	else:
 		update_leg_animation()
-
 	if not is_attacking:
 		update_torso_animation()
+	
 
 func update_leg_animation():
 	var threshold = 0.01  # Define a small threshold for velocity
 
 	if is_jumping:
-		legs_sprite.play("jump_up")
+		if velocity.y < 0:
+			animPlayer_legs.play("jump_up")
+			is_falling = false
+		elif not is_falling and velocity.y > 0 and is_close_to_floor():
+			animPlayer_legs.play("jump_down")
+			is_falling = true
 	elif direction == Vector2.ZERO or velocity.length() < threshold:
-		legs_sprite.play("idle_legs")  # Ensure legs go back to idle when not moving
+		animPlayer_legs.play("idle_legs")  # Ensure legs go back to idle when not moving
 	else:
-		if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
-			legs_sprite.speed_scale = -1  # Play animation in reverse
-		else:
-			legs_sprite.speed_scale = 1  # Play animation normally
-		legs_sprite.play("walk")
+		if not is_jumping:
+			if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
+				animPlayer_legs.speed_scale = -1  # Play animation in reverse
+			else:
+				animPlayer_legs.speed_scale = 1  # Play animation normally
+			animPlayer_legs.play("walk")
+
+
 
 func print_debug(message: String):
-	print(message)
+	print(player_name + ": " + message)
 
 # Additional function to debug the is_midSwing_complete state
 func _process(_delta):
@@ -318,3 +324,19 @@ func _process(_delta):
 
 #func _on_grounded_updated(is_jumping):
 	#pass # Replace with function body.
+
+
+func _on_torso_animation_player_animation_finished(_anim_name: StringName):
+	#if is_attacking and (animPlayer_torso.current_animation == "attack1" or animPlayer_torso.current_animation == "attack2" or animPlayer_torso.current_animation == "attack3"):
+	is_attacking = false
+		# Change the stance only after the attack animation finishes
+	if next_stance != "":
+		current_stance = next_stance
+		next_stance = ""
+	update_torso_animation()
+	current_torso_animation = ""
+
+func _on_legs_animation_player_animation_finished(_anim_name: StringName):
+	if animPlayer_legs.current_animation == "jump_down":
+		#is_jumping = false
+		update_leg_animation()

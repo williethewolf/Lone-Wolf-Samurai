@@ -37,15 +37,15 @@ func handle_input():
 	if Input.is_action_just_pressed(controls.move_left):
 		if Time.get_ticks_msec() / 1000.0 - character.last_tap_time_left < character.double_tap_interval:
 			character.facing = character.LEFT
-			character.legs_sprite.flip_h = true
-			character.torso_sprite.flip_h = true
+			character.legs_sprite.scale.x = -1
+			character.torso_sprite.scale.x = -1
 		character.last_tap_time_left = Time.get_ticks_msec() / 1000.0
 
 	if Input.is_action_just_pressed(controls.move_right):
 		if Time.get_ticks_msec() / 1000.0 - character.last_tap_time_right < character.double_tap_interval:
 			character.facing = character.RIGHT
-			character.legs_sprite.flip_h = false
-			character.torso_sprite.flip_h = false
+			character.legs_sprite.scale.x = 1
+			character.torso_sprite.scale.x = 1
 		character.last_tap_time_right = Time.get_ticks_msec() / 1000.0
 
 	if Input.is_action_just_pressed(controls.dash):
