@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://ceg7v7kg6vxsl" path="res://sprites/Character_sprites/top idle.png" id="12_4xksj"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
-radius = 18.25
+radius = 31.25
 height = 166.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ned2n"]
@@ -864,8 +864,59 @@ animations = [{
 size = Vector2(76.2923, 8.1364)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0r20q"]
-radius = 25.0
+radius = 17.0
 height = 156.0
+
+[sub_resource type="Animation" id="Animation_w88dt"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-30.1794, -60.9144)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.193732]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_3c6gl"]
 resource_name = "attack1"
@@ -904,7 +955,7 @@ tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.0228, 0.0456, 0.0684, 0.0912, 0.114, 0.1368, 0.1596),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
+"update": 0,
 "values": [Vector2(-30.283, -60.894), Vector2(-9, -81), Vector2(81, -77), Vector2(100, -17), Vector2(87, 36), Vector2(60.0428, 56.4094), Vector2(38.5993, 68.6917), Vector2(28.322, 66.9221)]
 }
 tracks/3/type = "value"
@@ -916,7 +967,7 @@ tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.0228, 0.0456, 0.0684, 0.0912, 0.114, 0.1368, 0.1596),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
+"update": 0,
 "values": [-0.193732, 0.577704, 2.18341, 2.89899, 3.52731, 3.82402, 4.10327, 4.2778]
 }
 tracks/4/type = "value"
@@ -938,10 +989,10 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.181818),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true]
 }
 
 [sub_resource type="Animation" id="Animation_2tmy8"]
@@ -1014,10 +1065,10 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.165367),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true]
 }
 
 [sub_resource type="Animation" id="Animation_222nh"]
@@ -1090,10 +1141,10 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.160805),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true]
 }
 
 [sub_resource type="Animation" id="Animation_ashgq"]
@@ -1166,10 +1217,10 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.179487),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true]
 }
 
 [sub_resource type="Animation" id="Animation_y8jkk"]
@@ -1282,57 +1333,6 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": ["stanceTop"]
-}
-
-[sub_resource type="Animation" id="Animation_w88dt"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-30.1794, -60.9144)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [-0.193732]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:scale")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(1, 1)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShape2D:disabled")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_24y8y"]
@@ -1566,7 +1566,7 @@ animation = &"idle_legs"
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
 sprite_frames = SubResource("SpriteFrames_k50ex")
-animation = &"stanceTop"
+animation = &"attack2"
 
 [node name="SwordHitArea" type="Area2D" parent="AnimatedSprite2DTorso"]
 
@@ -1579,7 +1579,7 @@ disabled = true
 [node name="HurtboxArea" type="Area2D" parent="AnimatedSprite2DTorso" groups=["hurtbox"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2DTorso/HurtboxArea"]
-position = Vector2(2, 18)
+position = Vector2(-2, 14)
 shape = SubResource("CapsuleShape2D_0r20q")
 
 [node name="TorsoAnimationPlayer" type="AnimationPlayer" parent="."]

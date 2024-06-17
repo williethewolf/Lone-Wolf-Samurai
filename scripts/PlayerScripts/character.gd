@@ -58,6 +58,11 @@ var next_stance = ""
 var stance_button_held = false
 var is_midSwing_complete = false
 
+#attack variables for signals to AI and impact logic
+var current_attack_stance = ""
+
+var is_attack_blocked = false
+
 #Receiving damage flags
 var is_taking_damage = false
 
@@ -186,9 +191,12 @@ func perform_attack(attack_stance) -> void:
 		return  # Prevent starting a new attack if already attacking
 
 	is_attacking = true  # Set attacking flag to true
+	is_attack_blocked = false # Reset the attack blocked flag
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
 	var penalty_duration = stance_penalty_duration
+	
+	current_attack_stance = attack_stance
 	
 	if current_stance == "Mid" and attack_stance == "Mid":
 		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
@@ -205,6 +213,7 @@ func perform_attack(attack_stance) -> void:
 		next_stance = attack_stance
 		animPlayer_torso.play("stance" + attack_stance)
 		stance_change_cooldown = true  # Start stance change cooldown
+		#current_stance = attack_stance
 		await get_tree().create_timer(penalty_duration).timeout
 		stance_change_cooldown = false  # End stance change cooldown
 	
@@ -224,15 +233,23 @@ func perform_attack(attack_stance) -> void:
 	elif attack_stance == "Low":
 		next_stance = "Top"
 		animPlayer_torso.play("attack3")
-
+	
 	# Wait for the duration of the animation before allowing another attack
 	var attack_duration = animation_lengths[attack_stance]
 	await get_tree().create_timer(attack_duration).timeout
+	
+	if is_attack_blocked:
+		attack_cooldown = false  # End attack cooldown
+		is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
+		update_torso_animation()
+		return
+		
 	attack_cooldown = false  # End attack cooldown
 	is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
 	update_torso_animation()
 
 func change_stance(new_stance: String):
+	is_attack_blocked = false
 	if current_stance == new_stance and current_stance != "Mid":
 		return  # Prevent stance change if it's the same as the current stance (except for Mid)
 	current_stance = new_stance
@@ -244,12 +261,37 @@ func change_stance(new_stance: String):
 	stance_change_cooldown = true  # Start stance change cooldown
 	await get_tree().create_timer(stanceChangeCooldown).timeout
 	stance_change_cooldown = false  # End stance change cooldown
-	update_torso_animation()
+	#update_torso_animation()
+
+func set_current_stance(stance: String):
+	current_stance = stance
 
 func unseathe_sword():
 	if sword_sheathed:
 		sword_sheathed = false
-	update_torso_animation()
+	#update_torso_animation()
+	
+func _on_sword_hit_area_area_entered(area):
+	
+	if area.is_in_group("hurtbox") and area.owner != self:
+		var attacker_stance = current_attack_stance
+		var defender_stance = area.owner.current_stance  # Assuming the defender also has current_stance variable
+		
+		if is_blocked(attacker_stance, defender_stance):
+			print_debug(attacker_stance," attack blocked by " + area.owner.player_name)
+			is_attack_blocked = true  # Set the attack blocked flag
+			call_deferred("_interrupt_attack")  # Defer the attack interruption
+			#animPlayer_torso.play("block_reaction")  # Play block reaction animation
+		else:
+			print_debug("sword colliding with hurtbox ", area.owner)
+			area.owner.take_damage(attack_damage_calculator())
+		
+func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
+	return attacker_stance == defender_stance
+	
+	
+func attack_damage_calculator():
+	return randi_range(damageRange[0], damageRange[1])
 	
 func take_damage(amount: int):
 	if is_taking_damage:
@@ -260,7 +302,7 @@ func take_damage(amount: int):
 		# Character dies
 		modulate = Color(0, 0, 0)  # Turn completely black
 		# Defer the freeing of the node
-		call_deferred("free")
+		call_deferred("queue_free")
 		#queue_free()  # Remove character from scene
 	else:
 		is_taking_damage = true
@@ -268,9 +310,6 @@ func take_damage(amount: int):
 		await get_tree().create_timer(0.1).timeout  # Flash duration
 		modulate = Color(1, 1, 1)  # Reset color back to normal
 		is_taking_damage = false
-		
-func attack_damage_calculator():
-	return randi_range(damageRange[0], damageRange[1])
 
 func update_torso_animation():
 	if not is_attacking:
@@ -340,7 +379,11 @@ func update_leg_animation():
 
 func print_debug(message: String):
 	print(player_name + ": " + message)
-
+	
+func _interrupt_attack():
+	animPlayer_torso.stop()  # Stop the attack animation
+	#animPlayer_torso.play("block_reaction")  # Play block reaction animation
+	
 # Additional function to debug the is_midSwing_complete state
 func _process(_delta):
 	#print("is_jumping:", is_jumping)
@@ -353,10 +396,14 @@ func _process(_delta):
 func _on_torso_animation_player_animation_finished(_anim_name: StringName):
 	#if is_attacking and (animPlayer_torso.current_animation == "attack1" or animPlayer_torso.current_animation == "attack2" or animPlayer_torso.current_animation == "attack3"):
 	is_attacking = false
-		# Change the stance only after the attack animation finishes
-	if next_stance != "":
-		current_stance = next_stance
-		next_stance = ""
+	if is_attack_blocked:
+		# If the attack was blocked, do not change the stance
+		is_attack_blocked = false  # Reset the flag
+	else:
+		# Change the stance only after the attack animation finishes if not blocked
+		if next_stance != "":
+			current_stance = next_stance
+			next_stance = ""
 	update_torso_animation()
 	current_torso_animation = ""
 
@@ -366,10 +413,5 @@ func _on_legs_animation_player_animation_finished(_anim_name: StringName):
 		update_leg_animation()
 
 
-func _on_sword_hit_area_area_entered(area):
-	
-	if area.is_in_group("hurtbox") and area.owner != self:
-		print_debug("sword colliding with hurtbox", area.owner)
-		area.owner.take_damage(attack_damage_calculator())
-	
+
 
