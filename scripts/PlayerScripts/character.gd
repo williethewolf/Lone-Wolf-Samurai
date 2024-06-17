@@ -14,6 +14,7 @@ var current_stance = "Mid"
 @export var player_height: float = 175.0  # Player height in centimeters (1.75 meters)
 @export var stance_penalty_duration: float = 0.5  # Penalty duration in seconds
 @export var stanceChangeCooldown: float = 0.2  # Cooldown for changing stances
+@export var damageRange = [90,200]
 
 # Constants for movement and controls
 const LEFT = Vector2(-1, 0)
@@ -267,7 +268,7 @@ func take_damage(amount: int):
 		is_taking_damage = false
 		
 func attack_damage_calculator():
-	return randi_range(10, 20)
+	return randi_range(damageRange[0], damageRange[1])
 
 func update_torso_animation():
 	if not is_attacking:
