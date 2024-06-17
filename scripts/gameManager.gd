@@ -88,7 +88,15 @@ func _physics_process(_delta):
 			else:
 				#print("They are NOT close")
 				switch_to_individual_cameras()
-
+		elif player1_pos:
+			# Only player 1 is valid
+			if not is_multiplayer_camera_active:
+				switch_to_individual_cameras()
+		elif player2_pos:
+			# Only player 2 is valid
+			if not is_multiplayer_camera_active:
+				switch_to_individual_cameras()
+			
 		for player_number in players.keys():
 			var node = players[player_number]
 			var player_pos
@@ -99,6 +107,8 @@ func _physics_process(_delta):
 				node["camera"]._update_camera_offset(distanceToFloorline)
 				#print("Camera", node["camera"].name, "target_offset_y:", node["camera"].target_offset_y, "current_offset.y:", node["camera"].offset.y)
 				update_line_thickness(distance)
+			else:
+				player_pos = null
 
 			# Update the line thickness even if there's only one player left
 			update_line_thickness(distance)

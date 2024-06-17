@@ -259,7 +259,9 @@ func take_damage(amount: int):
 	if life <= 0:
 		# Character dies
 		modulate = Color(0, 0, 0)  # Turn completely black
-		queue_free()  # Remove character from scene
+		# Defer the freeing of the node
+		call_deferred("free")
+		#queue_free()  # Remove character from scene
 	else:
 		is_taking_damage = true
 		modulate = Color(1, 0, 0)  # Flash red
