@@ -60,8 +60,10 @@ var is_midSwing_complete = false
 
 #attack variables for signals to AI and impact logic
 var current_attack_stance = ""
-
 var is_attack_blocked = false
+#signals
+signal stance_changed(new_stance: String)
+signal attack_stance_changed(new_attack_stance: String)
 
 #Receiving damage flags
 var is_taking_damage = false
@@ -192,11 +194,12 @@ func perform_attack(attack_stance) -> void:
 
 	is_attacking = true  # Set attacking flag to true
 	is_attack_blocked = false # Reset the attack blocked flag
+	emit_signal("attack_stance_changed", attack_stance)  # Emit signal for attack stance change
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
 	var penalty_duration = stance_penalty_duration
 	
-	current_attack_stance = attack_stance
+	current_attack_stance = attack_stance # Set the global attack stance
 	
 	if current_stance == "Mid" and attack_stance == "Mid":
 		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
@@ -239,6 +242,7 @@ func perform_attack(attack_stance) -> void:
 	await get_tree().create_timer(attack_duration).timeout
 	
 	if is_attack_blocked:
+		call_deferred("_apply_block_penalty")
 		attack_cooldown = false  # End attack cooldown
 		is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
 		update_torso_animation()
@@ -247,7 +251,13 @@ func perform_attack(attack_stance) -> void:
 	attack_cooldown = false  # End attack cooldown
 	is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
 	update_torso_animation()
-
+	
+func _apply_block_penalty():
+	stance_change_cooldown = true  # Start stance change cooldown
+	await get_tree().create_timer(stance_penalty_duration).timeout
+	stance_change_cooldown = false  # End stance change cooldown
+	is_attack_blocked = false  # Reset the attack blocked flag
+	
 func change_stance(new_stance: String):
 	is_attack_blocked = false
 	if current_stance == new_stance and current_stance != "Mid":
@@ -255,6 +265,7 @@ func change_stance(new_stance: String):
 	current_stance = new_stance
 	unseathe_sword()
 	is_midSwing_complete= false
+	emit_signal("stance_changed", new_stance)  # Emit signal for stance change
 	if is_attacking:
 		animPlayer_torso.stop()
 		is_attacking = false
@@ -272,23 +283,28 @@ func unseathe_sword():
 	#update_torso_animation()
 	
 func _on_sword_hit_area_area_entered(area):
-	
-	if area.is_in_group("hurtbox") and area.owner != self:
-		var attacker_stance = current_attack_stance
-		var defender_stance = area.owner.current_stance  # Assuming the defender also has current_stance variable
-		
-		if is_blocked(attacker_stance, defender_stance):
-			print_debug(attacker_stance," attack blocked by " + area.owner.player_name)
-			is_attack_blocked = true  # Set the attack blocked flag
-			call_deferred("_interrupt_attack")  # Defer the attack interruption
-			#animPlayer_torso.play("block_reaction")  # Play block reaction animation
-		else:
-			print_debug("sword colliding with hurtbox ", area.owner)
-			area.owner.take_damage(attack_damage_calculator())
+	var entity = area.owner
+	if area.is_in_group("hurtbox") and entity != self:
+		if entity is Character:
+			var attacker_stance = current_attack_stance
+			var defender_stance = area.owner.current_stance  # Assuming the defender also has current_stance variable
+			if is_facing_each_other(entity):
+				if is_blocked(attacker_stance, defender_stance):
+					print_debug(attacker_stance," attack blocked by " + area.owner.player_name)
+					is_attack_blocked = true  # Set the attack blocked flag
+					call_deferred("_interrupt_attack")  # Defer the attack interruption
+					#animPlayer_torso.play("block_reaction")  # Play block reaction animation
+			else:
+					print_debug("sword colliding with hurtbox ", area.owner)
+					area.owner.take_damage(attack_damage_calculator())
 		
 func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
 	return attacker_stance == defender_stance
 	
+func is_facing_each_other(entity) -> bool:
+	var self_facing_direction = 1 if facing == RIGHT else -1
+	var entity_facing_direction = 1 if entity.facing == RIGHT else -1
+	return (global_position - entity.global_position).x * self_facing_direction < 0 and self_facing_direction != entity_facing_direction	
 	
 func attack_damage_calculator():
 	return randi_range(damageRange[0], damageRange[1])
