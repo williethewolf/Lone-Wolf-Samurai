@@ -5,7 +5,7 @@ class_name Character
 
 # Player properties
 @export var life: int = 100
-@export var stamina: int = 4
+@export var stamina: int = 100
 var stance = ["Top", "Mid", "Low"]
 var current_stance = "Mid"
 @export var player_name: String = "player1"
@@ -57,6 +57,9 @@ var next_stance = ""
 var stance_button_held = false
 var is_midSwing_complete = false
 
+#Receiving damage flags
+var is_taking_damage = false
+
 # Reference to the AnimationPlayer nodes
 @onready var animPlayer_legs = $LegsAnimationPlayer
 @onready var animPlayer_torso = $TorsoAnimationPlayer
@@ -64,6 +67,7 @@ var is_midSwing_complete = false
 # Reference to the AnimatedSprite2D nodes
 @onready var legs_sprite = $AnimatedSprite2DLegs
 @onready var torso_sprite = $AnimatedSprite2DTorso
+
 # Current animation state
 var current_torso_animation = ""
 
@@ -133,9 +137,7 @@ func handle_jump(_delta):
 			#velocity.y = 0
 			#animPlayer_legs.play("idle_legs")
 			emit_signal("grounded_updated", is_jumping)
-			print_debug("Player on floor is_jumping:", is_jumping)
 	else:
-		print_debug("player not on floor is_jumping:", is_jumping)
 		#if not is_jumping:  # Only change if it was not previously jumping
 		is_jumping = true
 			#print("Jumping or falling: is_jumping:", is_jumping)
@@ -247,6 +249,25 @@ func unseathe_sword():
 	if sword_sheathed:
 		sword_sheathed = false
 	update_torso_animation()
+	
+func take_damage(amount: int):
+	if is_taking_damage:
+		return # Prevent taking damage if already in the process of taking damage
+
+	life -= amount
+	if life <= 0:
+		# Character dies
+		modulate = Color(0, 0, 0)  # Turn completely black
+		queue_free()  # Remove character from scene
+	else:
+		is_taking_damage = true
+		modulate = Color(1, 0, 0)  # Flash red
+		await get_tree().create_timer(0.1).timeout  # Flash duration
+		modulate = Color(1, 1, 1)  # Reset color back to normal
+		is_taking_damage = false
+		
+func attack_damage_calculator():
+	return randi_range(10, 20)
 
 func update_torso_animation():
 	if not is_attacking:
@@ -340,3 +361,12 @@ func _on_legs_animation_player_animation_finished(_anim_name: StringName):
 	if animPlayer_legs.current_animation == "jump_down":
 		#is_jumping = false
 		update_leg_animation()
+
+
+func _on_sword_hit_area_area_entered(area):
+	
+	if area.is_in_group("hurtbox") and area.owner != self:
+		print_debug("sword colliding with hurtbox", area.owner)
+		area.owner.take_damage(attack_damage_calculator())
+	
+
