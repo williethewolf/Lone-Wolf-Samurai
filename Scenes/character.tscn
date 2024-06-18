@@ -1582,6 +1582,14 @@ disabled = true
 position = Vector2(-2, 14)
 shape = SubResource("CapsuleShape2D_0r20q")
 
+[node name="FrontRaycast" type="RayCast2D" parent="AnimatedSprite2DTorso"]
+position = Vector2(26, 0)
+target_position = Vector2(400, 0)
+
+[node name="BackRaycast" type="RayCast2D" parent="AnimatedSprite2DTorso"]
+position = Vector2(-26, 0)
+target_position = Vector2(-300, 0)
+
 [node name="TorsoAnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 "": SubResource("AnimationLibrary_24y8y")

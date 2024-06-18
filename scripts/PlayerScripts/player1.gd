@@ -62,3 +62,4 @@ func handle_input():
 
 		character.handle_stance_change()
 		character.handle_attacks()
+		character.handle_target_switch()
