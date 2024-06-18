@@ -8,9 +8,6 @@
 script = ExtResource("1_lfuv6")
 character_path = NodePath("character")
 controls = ExtResource("3_vj0ox")
-player_number = null
-jump_height = null
-min_jump_height = null
 
 [node name="character" parent="." instance=ExtResource("2_5y1v4")]
 controls = ExtResource("3_vj0ox")

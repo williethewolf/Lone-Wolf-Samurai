@@ -633,9 +633,6 @@ sources/0 = SubResource("TileSetAtlasSource_pjx3a")
 [node name="Players" type="Node2D" parent="."]
 
 [node name="Player1" parent="Players" groups=["Players"] instance=ExtResource("1_nvc63")]
-player_number = null
-jump_height = null
-min_jump_height = null
 
 [node name="Player2" parent="Players" groups=["Players"] instance=ExtResource("6_a0xtt")]
 position = Vector2(773, 0)

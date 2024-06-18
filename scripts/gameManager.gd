@@ -63,95 +63,102 @@ func populate_players():
 			print("Initialized player", player_number, "with camera", camera.name)
 		else:
 			print("SubViewportContainer not found for player " + str(player_number))
-		
+
 func _physics_process(_delta):
-	if players.has(2) and players.has(1):
-		var player1_pos = players[1]["player"].get_node("character").global_position
-		var player2_pos = players[2]["player"].get_node("character").global_position
-		distance = player1_pos.distance_to(player2_pos)
-		#print("Distance between players:", distance)
-		if distance <= 650 and not is_multiplayer_camera_active:
-			#print("They are close")
-			switch_to_multiplayer_camera()
-			is_multiplayer_camera_active = true
-		elif distance > 650 and is_multiplayer_camera_active:
-			#print("They are NOT close")
-			switch_to_individual_cameras()
-			is_multiplayer_camera_active = false
+	if players.has(1) and players.has(2):
+		var player1_pos
+		var player2_pos
+		
+		if players[1] and players[1]["player"] and is_instance_valid(players[1]["player"].get_node_or_null("character")):
+			player1_pos = players[1]["player"].get_node("character").global_position
+		else:
+			player1_pos = null
+		
+		if players[2] and players[2]["player"] and is_instance_valid(players[2]["player"].get_node_or_null("character")):
+			player2_pos = players[2]["player"].get_node("character").global_position
+		else:
+			player2_pos = null
+		
+		if player1_pos and player2_pos:
+			distance = player1_pos.distance_to(player2_pos)
+			#print("Distance between players:", distance)
+			if distance <= 650:
+				#print("They are close")
+				switch_to_multiplayer_camera()
+			else:
+				#print("They are NOT close")
+				switch_to_individual_cameras()
+
 		for player_number in players.keys():
 			var node = players[player_number]
-			var player_pos = node["player"].get_node("character").global_position
-			distanceToFloorline = round(abs(player_pos.y - floorLineCoords.y + 88))  # Add offset to normalize
-			#print("Player", player_number, "global_position:", player_pos, "distanceToFloorline:", distanceToFloorline)  # Debug: Check distance to floorline
-			node["camera"]._update_camera_offset(distanceToFloorline)
-			#print("Camera", node["camera"].name, "target_offset_y:", node["camera"].target_offset_y, "current_offset.y:", node["camera"].offset.y)
+			var player_pos
+			if node and node["player"] and is_instance_valid(node["player"].get_node_or_null("character")):
+				player_pos = node["player"].get_node("character").global_position
+				distanceToFloorline = round(abs(player_pos.y - floorLineCoords.y + 88))  # Add offset to normalize
+				#print("Player", player_number, "global_position:", player_pos, "distanceToFloorline:", distanceToFloorline)  # Debug: Check distance to floorline
+				node["camera"]._update_camera_offset(distanceToFloorline)
+				#print("Camera", node["camera"].name, "target_offset_y:", node["camera"].target_offset_y, "current_offset.y:", node["camera"].offset.y)
+				update_line_thickness(distance)
+
+			# Update the line thickness even if there's only one player left
 			update_line_thickness(distance)
-			
+
 func switch_to_multiplayer_camera():
 	# Set both players to use the same world
-	players[1]["viewport"].world_2d = multiplayer_camera.get_viewport().world_2d
-	players[2]["viewport"].world_2d = multiplayer_camera.get_viewport().world_2d
-	
+	if players.has(1):
+		players[1]["viewport"].world_2d = multiplayer_camera.get_viewport().world_2d
+	if players.has(2):
+		players[2]["viewport"].world_2d = multiplayer_camera.get_viewport().world_2d
 	
 	# Tween out individual viewport containers
 	if tween:
 		tween.kill()
 	tween = create_tween()
 	
-# 	Enable multiplayer viewport container
+	# Enable multiplayer viewport container
 	tween.tween_callback(multiplayerViewportEnabler.bind(true))
-	tween.parallel().tween_property(players[1]["sub_viewport_container"], "modulate:a", 0.0, 0.3)
-	tween.parallel().tween_property(players[2]["sub_viewport_container"], "modulate:a", 0.0, 0.3)
+	if players.has(1):
+		tween.parallel().tween_property(players[1]["sub_viewport_container"], "modulate:a", 0.0, 0.3)
+	if players.has(2):
+		tween.parallel().tween_property(players[2]["sub_viewport_container"], "modulate:a", 0.0, 0.3)
 
 	# Disable individual viewport containers
 	tween.tween_callback(individualViewportEnabler.bind(false))
 
-	
-
-
 func switch_to_individual_cameras():
 	# Revert viewports to their original world
-	players[1]["viewport"].world_2d = players[1]["camera"].get_viewport().world_2d
-	players[2]["viewport"].world_2d = players[2]["camera"].get_viewport().world_2d
+	if players.has(1):
+		players[1]["viewport"].world_2d = players[1]["camera"].get_viewport().world_2d
+	if players.has(2):
+		players[2]["viewport"].world_2d = players[2]["camera"].get_viewport().world_2d
 	
 	# Tween out multiplayer viewport container
 	if tween:
 		tween.kill()
 	tween = create_tween()
 	tween.tween_callback(individualViewportEnabler.bind(true))
-	tween.parallel().tween_property(players[1]["sub_viewport_container"], "modulate:a", 1.0, 0.3)
-	tween.parallel().tween_property(players[2]["sub_viewport_container"], "modulate:a", 1.0, 0.3)
+	if players.has(1):
+		tween.parallel().tween_property(players[1]["sub_viewport_container"], "modulate:a", 1.0, 0.3)
+	if players.has(2):
+		tween.parallel().tween_property(players[2]["sub_viewport_container"], "modulate:a", 1.0, 0.3)
 	tween.tween_callback(multiplayerViewportEnabler.bind(false))
-	# Disable multiplayer viewport container
-	#multiplayer_viewport_container.visible = false
-	
-	# Enable individual viewport containers
-	#players[1]["sub_viewport_container"].visible = true
-	#players[2]["sub_viewport_container"].visible = true
-	
-	
 
-	
-	
 func multiplayerViewportEnabler(state):
-	print("changing individual viewport status")
 	multiplayer_viewport_container.visible = state
 	if state == true:
 		multiplayer_viewport_container.modulate.a = 1
-	print("changing multiplayer viewport status to ",state)
-	
+
 func individualViewportEnabler(state):
-	print("changing individual viewport status")
-	players[1]["sub_viewport_container"].visible = state
-	players[2]["sub_viewport_container"].visible = state
+	if players.has(1):
+		players[1]["sub_viewport_container"].visible = state
+	if players.has(2):
+		players[2]["sub_viewport_container"].visible = state
 	if state == true:
-		players[1]["sub_viewport_container"].modulate.a = 0
-		players[2]["sub_viewport_container"].modulate.a = 0
-	print("changing individual viewport status to ",state)
-	
+		if players.has(1):
+			players[1]["sub_viewport_container"].modulate.a = 0
+		if players.has(2):
+			players[2]["sub_viewport_container"].modulate.a = 0
+
 func update_line_thickness(distanceBetweenPlayers):
 	var target_thickness = lerp(4, 0, clamp((700 - distanceBetweenPlayers) / 50, 0, 1))  # Adjust these values for thickness range
 	line.size.x = target_thickness
-	
-func print_test():
-	print("It calls this bitch")

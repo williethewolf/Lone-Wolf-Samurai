@@ -13,4 +13,5 @@ extends Resource
 @export var stance_low := "p1_stanceLow"
 @export var attack_low := "p1_attackLow"
 @export var dash:= "p1_dash"
+@export var change_target := "p1_changeTarget"
 
