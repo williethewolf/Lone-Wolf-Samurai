@@ -1,14 +1,15 @@
 [gd_scene load_steps=4 format=3 uid="uid://bepmiy1cu1ar5"]
 
-[ext_resource type="Script" path="res://scripts/PlayerScripts/player2.gd" id="1_4rnb5"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/player1.gd" id="1_6b0wb"]
 [ext_resource type="Resource" uid="uid://7qyvr7oqdl16" path="res://Scenes/player_2_controls.tres" id="2_10rmp"]
 [ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="2_gk4bp"]
 
 [node name="Player2" type="Node2D"]
 z_index = 1
-script = ExtResource("1_4rnb5")
+script = ExtResource("1_6b0wb")
 character_path = NodePath("character")
 controls = ExtResource("2_10rmp")
+player_number = 2
 
 [node name="character" parent="." instance=ExtResource("2_gk4bp")]
 player_name = "player2"

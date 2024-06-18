@@ -16,33 +16,8 @@ var current_stance = "Mid"
 @export var stanceChangeCooldown: float = 0.2  # Cooldown for changing stances
 @export var damageRange = [90,200]
 
-# Constants for movement and controls
-const LEFT = Vector2(-1, 0)
-const RIGHT = Vector2(1, 0)
 #Multiplayer coop control variables
 @export var controls: Resource = null
-
-# Jump properties
-@export var jump_height: float = 200.0  # Jump height in pixels
-@export var min_jump_height: float = 50.0  # Minimum jump height in pixels
-@export var gravity: float = 5500.0  # Increased gravity strength
-@export var jump_speed: float = -1500.0  # Increased initial jump speed (more negative to move up faster)
-@export var jump_duration: float = 0.3  # Duration to reach full jump height
-var floor_y_position: float = 10
-
-# Movement variables
-var direction = Vector2.ZERO
-var facing = RIGHT
-
-# Dash variables
-var is_dashing = false
-@export var dash_speed: float = 1200.0  # Adjusted dash speed
-var dash_duration = 0.2
-var dash_timer = 0
-
-# Jump variables
-var is_jumping = false
-var is_falling = false
 
 # Unseath variables
 var sword_sheathed = true
@@ -104,6 +79,10 @@ var animation_lengths = {
 # Time tracking
 var attack_start_time = 0.0
 
+#Modules
+@onready var stamina_module = $StaminaModule
+@onready var movement_module = $MovementModule
+
 #for camera help
 signal grounded_updated (is_jumping)
 #this passes the transform to the parent so the camera can be there.
@@ -115,50 +94,17 @@ func _ready():
 	update_torso_animation()
 	animPlayer_legs.connect("animation_finished", Callable(self, "_on_legs_animation_player_animation_finished"))
 	animPlayer_torso.connect("animation_finished", Callable(self, "_on_torso_animation_player_animation_finished"))
+	movement_module.connect("grounded_updated", Callable(self, "_on_grounded_updated"))
 
 
 func _physics_process(delta):
-	apply_gravity(delta)
-	velocity.x = direction.x * speed
-	move_and_slide()  # Move and slide the character based on velocity
-	
-	handle_jump(delta)  # Always handle jumping
+	movement_module.apply_gravity(delta)
+	movement_module.move_and_slide()
+	movement_module.handle_jump(delta)
 	update_facing_direction()  # Update facing direction based on raycast
 	update_animation()  # This is called every frame to update animations
 
 
-func apply_gravity(delta):
-	if not is_on_floor():
-		velocity.y += gravity * delta
-	#print("Applying gravity: velocity.y =", velocity.y, "is_on_floor() =", is_on_floor())
-
-func dash():
-	is_dashing = true
-	dash_timer = dash_duration
-	velocity.x = facing.x * dash_speed
-	animPlayer_legs.play("dash")
-
-func jump():
-	is_jumping = true
-	velocity.y = jump_speed  # Set the initial jump speed
-	animPlayer_legs.play("jump_up")  # Play the first half of the jump animation
-	emit_signal("grounded_updated", is_jumping)
-
-func is_close_to_floor() -> bool:
-	return position.y + 75 >= floor_y_position  # Adjust this threshold as needed
-
-func handle_jump(_delta):
-	# Check if the character is on the floor
-	if is_on_floor():
-		#if is_jumping:  # Only change if it was previously jumping
-			is_jumping = false
-			#velocity.y = 0
-			#animPlayer_legs.play("idle_legs")
-			emit_signal("grounded_updated", is_jumping)
-	else:
-		#if not is_jumping:  # Only change if it was not previously jumping
-		is_jumping = true
-			#print("Jumping or falling: is_jumping:", is_jumping)
 func update_facing_direction():
 	# Remove enemies no longer in range
 	for enemy in enemies_in_range:
@@ -190,45 +136,45 @@ func update_facing_direction():
 	else:
 		if front_ray.is_colliding() and front_ray.get_collider() is Character:
 			is_engaged = true
-			is_facing_right = facing == RIGHT  # Maintain current facing direction
+			is_facing_right = movement_module.facing == movement_module.RIGHT  # Maintain current facing direction
 		elif back_ray.is_colliding() and back_ray.get_collider() is Character:
 			is_engaged = true
-			is_facing_right = facing == LEFT
+			is_facing_right = movement_module.facing == movement_module.LEFT
 			legs_sprite.scale.x = -legs_sprite.scale.x  # Flip the character
 			torso_sprite.scale.x = -torso_sprite.scale.x
-			facing = LEFT if is_facing_right else RIGHT
+			movement_module.facing = movement_module.LEFT if is_facing_right else movement_module.RIGHT
 
 	# Update facing direction based on engagement
 	if not is_engaged:
-		if direction.x > 0:
-			facing = RIGHT
+		if movement_module.direction.x > 0:
+			movement_module.facing = movement_module.RIGHT
 			is_facing_right = true
 			legs_sprite.scale.x = 1
 			torso_sprite.scale.x = 1
-		elif direction.x < 0:
-			facing = LEFT
+		elif movement_module.direction.x < 0:
+			movement_module.facing = movement_module.LEFT
 			is_facing_right = false
 			legs_sprite.scale.x = -1
 			torso_sprite.scale.x = -1
 
 func engage_enemy(enemy):
-	facing = RIGHT if global_position.x < enemy.global_position.x else LEFT
-	legs_sprite.scale.x = 1 if facing == RIGHT else -1
-	torso_sprite.scale.x = 1 if facing == RIGHT else -1
+	movement_module.facing = movement_module.RIGHT if global_position.x < enemy.global_position.x else movement_module.LEFT
+	legs_sprite.scale.x = 1 if movement_module.facing == movement_module.RIGHT else -1
+	torso_sprite.scale.x = 1 if movement_module.facing == movement_module.RIGHT else -1
 
 func switch_engagement(facing_direction):
 	if enemies_in_range.size() > 0:
 		for enemy in enemies_in_range:
-			if (facing_direction == RIGHT and global_position.x < enemy.global_position.x) or (facing_direction == LEFT and global_position.x > enemy.global_position.x):
+			if (facing_direction == movement_module.RIGHT and global_position.x < enemy.global_position.x) or (facing_direction == movement_module.LEFT and global_position.x > enemy.global_position.x):
 				engage_enemy(enemy)
 				break
 func handle_target_switch():
 	# Switch engagement based on joystick direction
-	if Input.is_action_pressed(controls.stance_midL) and facing == RIGHT:
-		switch_engagement(RIGHT)
-	elif Input.is_action_pressed(controls.stance_mid) and facing == LEFT:
+	if Input.is_action_pressed(controls.stance_midL) and movement_module.facing == movement_module.RIGHT:
+		switch_engagement(movement_module.RIGHT)
+	elif Input.is_action_pressed(controls.stance_mid) and movement_module.facing == movement_module.LEFT:
 		stance_button_held = true
-		switch_engagement(LEFT)
+		switch_engagement(movement_module.LEFT)
 
 func handle_stance_change():
 	if stance_change_cooldown:
@@ -244,11 +190,11 @@ func handle_stance_change():
 		stance_button_held = true
 		if current_stance != "Low":
 			change_stance("Low")
-	elif Input.is_action_pressed(controls.stance_mid) and facing == RIGHT:
+	elif Input.is_action_pressed(controls.stance_mid) and movement_module.facing == movement_module.RIGHT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
-	elif Input.is_action_pressed(controls.stance_midL) and facing == LEFT:
+	elif Input.is_action_pressed(controls.stance_midL) and movement_module.facing == movement_module.LEFT:
 		stance_button_held = true
 		if current_stance != "Mid":
 			change_stance("Mid")
@@ -384,8 +330,8 @@ func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
 	return attacker_stance == defender_stance
 	
 func is_facing_each_other(entity) -> bool:
-	var self_facing_direction = 1 if facing == RIGHT else -1
-	var entity_facing_direction = 1 if entity.facing == RIGHT else -1
+	var self_facing_direction = 1 if movement_module.facing == movement_module.RIGHT else -1
+	var entity_facing_direction = 1 if entity.movement_module.facing == movement_module.RIGHT else -1
 	return (global_position - entity.global_position).x * self_facing_direction < 0 and self_facing_direction != entity_facing_direction
 
 	
@@ -446,7 +392,7 @@ func update_animation():
 			#else:
 				#animPlayer_legs.speed_scale = 1  # Play animation normally
 			#animPlayer_legs.play("walk")
-	if is_dashing:
+	if movement_module.is_dashing:
 		legs_sprite.play("dash")
 	else:
 		update_leg_animation()
@@ -457,18 +403,19 @@ func update_animation():
 func update_leg_animation():
 	var threshold = 0.01  # Define a small threshold for velocity
 
-	if is_jumping:
+	if movement_module.is_jumping:
 		if velocity.y < 0:
 			animPlayer_legs.play("jump_up")
-			is_falling = false
-		elif not is_falling and velocity.y > 0 and is_close_to_floor():
+			movement_module.is_falling = false
+		elif not movement_module.is_falling and velocity.y > 0 and movement_module.is_close_to_floor():
 			animPlayer_legs.play("jump_down")
-			is_falling = true
-	elif direction == Vector2.ZERO or velocity.length() < threshold:
+			movement_module.is_falling = true
+	elif movement_module.direction == Vector2.ZERO or velocity.length() < threshold:
 		animPlayer_legs.play("idle_legs")  # Ensure legs go back to idle when not moving
 	else:
-		if not is_jumping:
-			if (facing == LEFT and direction == RIGHT) or (facing == RIGHT and direction == LEFT):
+		if not movement_module.is_jumping:
+			if ((movement_module.facing == movement_module.LEFT and movement_module.direction == movement_module.RIGHT) or 
+				(movement_module.facing == movement_module.RIGHT and movement_module.direction == movement_module.LEFT)):
 				animPlayer_legs.speed_scale = -1  # Play animation in reverse
 			else:
 				animPlayer_legs.speed_scale = 1  # Play animation normally

@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_fjklo")
-player_index = 0
+player_index = 1
 move_left = "p1_move_left"
 move_right = "p1_move_right"
 jump = "p1_jump"
@@ -16,3 +16,4 @@ attack_mid = "p1_attackMid"
 stance_low = "p1_stanceLow"
 attack_low = "p1_attackLow"
 dash = "p1_dash"
+change_target = "p1_changeTarget"

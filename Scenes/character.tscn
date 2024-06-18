@@ -1,4 +1,4 @@
-[gd_scene load_steps=144 format=3 uid="uid://cqt46glfqb27s"]
+[gd_scene load_steps=147 format=3 uid="uid://cqt46glfqb27s"]
 
 [ext_resource type="Script" path="res://scripts/PlayerScripts/character.gd" id="1_o6lj8"]
 [ext_resource type="Texture2D" uid="uid://bivbhw5o6q1je" path="res://sprites/Character_sprites/original-6c34028201504126cddc7c4c73109ad7.jpg" id="2_43g35"]
@@ -10,7 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://dnm2j80igxndf" path="res://sprites/Character_sprites/bottom attack anim sheet.png" id="9_4rw7u"]
 [ext_resource type="Texture2D" uid="uid://cdtb0ukw3wbej" path="res://sprites/Character_sprites/bottom idle sheet.png" id="10_lhn33"]
 [ext_resource type="Texture2D" uid="uid://dq0kjgnbknt0g" path="res://sprites/Character_sprites/upper body idle mid anim_sheet.png" id="11_v4o5l"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/StaminaModule.gd" id="12_4jad0"]
 [ext_resource type="Texture2D" uid="uid://ceg7v7kg6vxsl" path="res://sprites/Character_sprites/top idle.png" id="12_4xksj"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/MovementModule.gd" id="13_m5k3f"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/CombatModule.gd" id="14_fgos7"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
 radius = 31.25
@@ -1600,5 +1603,14 @@ root_node = NodePath("../TorsoAnimationPlayer")
 libraries = {
 "": SubResource("AnimationLibrary_hhul3")
 }
+
+[node name="StaminaModule" type="Node" parent="."]
+script = ExtResource("12_4jad0")
+
+[node name="MovementModule" type="Node" parent="."]
+script = ExtResource("13_m5k3f")
+
+[node name="CombatModule" type="Node" parent="."]
+script = ExtResource("14_fgos7")
 
 [connection signal="area_entered" from="AnimatedSprite2DTorso/SwordHitArea" to="." method="_on_sword_hit_area_area_entered"]

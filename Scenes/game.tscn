@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bncxcmigu4lac"]
 
 [ext_resource type="Script" path="res://scripts/gameManager.gd" id="1_x53j0"]
-[ext_resource type="Script" path="res://Scenes/TwoPlayerCamera.gd" id="3_e4bsi"]
+[ext_resource type="Script" path="res://scripts/TwoPlayerCamera.gd" id="3_e4bsi"]
 [ext_resource type="PackedScene" uid="uid://bb3wvexddf8t" path="res://Scenes/test_level.tscn" id="4_cbbi2"]
 [ext_resource type="Script" path="res://scripts/JumpCamera.gd" id="4_clkf2"]
 
