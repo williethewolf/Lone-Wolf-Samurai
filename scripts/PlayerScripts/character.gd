@@ -274,8 +274,8 @@ func change_stance(new_stance: String):
 	stance_change_cooldown = false  # End stance change cooldown
 	#update_torso_animation()
 
-func set_current_stance(stance: String):
-	current_stance = stance
+func set_current_stance(new_stance: String):
+	current_stance = new_stance
 
 func unseathe_sword():
 	if sword_sheathed:
@@ -294,6 +294,9 @@ func _on_sword_hit_area_area_entered(area):
 					is_attack_blocked = true  # Set the attack blocked flag
 					call_deferred("_interrupt_attack")  # Defer the attack interruption
 					#animPlayer_torso.play("block_reaction")  # Play block reaction animation
+				else:
+					print_debug("sword colliding with hurtbox ", area.owner)
+					area.owner.take_damage(attack_damage_calculator())
 			else:
 					print_debug("sword colliding with hurtbox ", area.owner)
 					area.owner.take_damage(attack_damage_calculator())
