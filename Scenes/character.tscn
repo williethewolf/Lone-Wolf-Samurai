@@ -1613,4 +1613,4 @@ script = ExtResource("13_m5k3f")
 [node name="CombatModule" type="Node" parent="."]
 script = ExtResource("14_fgos7")
 
-[connection signal="area_entered" from="AnimatedSprite2DTorso/SwordHitArea" to="." method="_on_sword_hit_area_area_entered"]
+[connection signal="area_entered" from="AnimatedSprite2DTorso/SwordHitArea" to="CombatModule" method="_on_sword_hit_area_area_entered"]

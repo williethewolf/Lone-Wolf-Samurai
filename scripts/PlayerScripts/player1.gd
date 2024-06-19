@@ -3,6 +3,7 @@ extends Node2D
 @export var character_path: NodePath = NodePath("")
 var character: Character
 var movement_module: Node
+var combat_module: Node
 
 #Multiplayer coop control variables
 @export var controls: Resource = null
@@ -15,11 +16,12 @@ var jump_pressed_duration = 0.0  # Duration for which the jump button is pressed
 var jump_duration: float = 0.05  # Duration to reach full jump height
 
 func _ready():
-	character = get_node(character_path) as Character
+	character = get_node_or_null(character_path) as Character
 	if not character:
 		print("Player " + str(player_number) + " node not found!")
 	else:
-		movement_module = character.get_node("MovementModule")
+		movement_module = character.get_node_or_null("MovementModule")
+		combat_module = character.get_node_or_null("CombatModule")
 		set_process(true)
 		character.player_name = "Player" + str(player_number)
 	#makes sure it is part of the players group
@@ -61,7 +63,8 @@ func handle_input():
 			var jump_ratio = jump_pressed_duration / jump_duration
 			character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
 			#movement_module.is_jumping = false
-
-		character.handle_stance_change()
-		character.handle_attacks()
 		character.handle_target_switch()
+	if combat_module and is_instance_valid(combat_module):
+		combat_module.handle_stance_change()
+		combat_module.handle_attacks()
+		
