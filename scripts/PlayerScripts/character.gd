@@ -60,14 +60,23 @@ func _ready():
 	animPlayer_legs.connect("animation_finished", Callable(self, "_on_legs_animation_player_animation_finished"))
 	animPlayer_torso.connect("animation_finished", Callable(self, "_on_torso_animation_player_animation_finished"))
 	movement_module.connect("grounded_updated", Callable(self, "_on_grounded_updated"))
+	stamina_module.connect("stamina_changed", Callable(self, "_on_stamina_changed"))
+	stamina_module.connect("stamina_exhausted", Callable(self, "_on_stamina_exhausted"))
 
 
 func _physics_process(delta):
+	# Update movement module states
 	movement_module.apply_gravity(delta)
 	movement_module.move_and_slide()
 	movement_module.handle_jump(delta)
+	
 	update_facing_direction()  # Update facing direction based on raycast
 	update_animation()  # This is called every frame to update animations
+	
+	# Update stamina module states
+	stamina_module.set_attacking(combat_module.is_attacking)  # Update attacking state
+	stamina_module.set_moving(movement_module.direction != Vector2.ZERO)  # Update moving state
+	stamina_module.regenerate_stamina(delta)
 
 # Combat-related functions
 
@@ -231,6 +240,15 @@ func _on_legs_animation_player_animation_finished(_anim_name: StringName):
 	if animPlayer_legs.current_animation == "jump_down":
 		#is_jumping = false
 		update_leg_animation()
+		
+func _on_stamina_changed(current_stamina: int):
+	# Handle stamina change (e.g., update UI)
+	pass
+
+func _on_stamina_exhausted():
+	# Handle stamina exhaustion (e.g., prevent attacking or dashing)
+	pass
+
 
 
 

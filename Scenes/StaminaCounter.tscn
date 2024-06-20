@@ -1,0 +1,75 @@
+[gd_scene load_steps=4 format=3 uid="uid://co8omo8pt3w8r"]
+
+[ext_resource type="Script" path="res://scripts/StaminaCounter.gd" id="1_gmxmt"]
+[ext_resource type="Texture2D" uid="uid://8esyokug653p" path="res://sprites/UI_sprites/StaminaCounter.png" id="2_8sagi"]
+[ext_resource type="Script" path="res://scripts/StaminaCounterFill.gd" id="3_o8rt2"]
+
+[node name="StaminaCounter" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_gmxmt")
+
+[node name="Circle0" type="TextureRect" parent="Control"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 1.0
+offset_right = 102.0
+offset_bottom = 41.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle0"]
+script = ExtResource("3_o8rt2")
+
+[node name="Circle1" type="TextureRect" parent="Control"]
+offset_left = 22.0
+offset_top = 29.0
+offset_right = 62.0
+offset_bottom = 69.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle1"]
+script = ExtResource("3_o8rt2")
+
+[node name="Circle2" type="TextureRect" parent="Control"]
+offset_left = 1.0
+offset_top = 72.0
+offset_right = 41.0
+offset_bottom = 112.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle2"]
+script = ExtResource("3_o8rt2")
+
+[node name="Circle3" type="TextureRect" parent="Control"]
+offset_left = 1.0
+offset_top = 117.0
+offset_right = 41.0
+offset_bottom = 157.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle3"]
+script = ExtResource("3_o8rt2")
+
+[node name="Circle4" type="TextureRect" parent="Control"]
+offset_left = 21.0
+offset_top = 162.0
+offset_right = 61.0
+offset_bottom = 202.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle4"]
+script = ExtResource("3_o8rt2")
+
+[node name="Circle5" type="TextureRect" parent="Control"]
+offset_left = 61.0
+offset_top = 185.0
+offset_right = 101.0
+offset_bottom = 225.0
+texture = ExtResource("2_8sagi")
+
+[node name="Node2D" type="Node2D" parent="Control/Circle5"]
+script = ExtResource("3_o8rt2")

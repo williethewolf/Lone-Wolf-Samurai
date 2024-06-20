@@ -40,6 +40,8 @@ var attack_animation_lengths = {
 # Time tracking
 var attack_start_time = 0.0
 
+@onready var stamina_module = $"../StaminaModule"
+
 func _ready():
 	character = $".."
 # Handle stance change
@@ -83,9 +85,9 @@ func handle_attacks():
 
 # Perform attack
 func perform_attack(attack_stance) -> void:
-	if is_attacking:
+	if is_attacking or stamina_module.is_exhausted:
 		return  # Prevent starting a new attack if already attacking
-
+	stamina_module.deplete_stamina(20) #MAKE THIS A PUBLIC VARIABLE
 	is_attacking = true  # Set attacking flag to true
 	is_attack_blocked = false # Reset the attack blocked flag
 	emit_signal("attack_stance_changed", attack_stance)  # Emit signal for attack stance change
@@ -201,6 +203,7 @@ func take_damage(amount: int):
 	if is_taking_damage:
 		return # Prevent taking damage if already in the process of taking damage
 
+	stamina_module.deplete_stamina(10) #MAKE THIS A PUBLIC VARIABLE
 	character.life -= amount
 	if character.life <= 0:
 		# Character dies

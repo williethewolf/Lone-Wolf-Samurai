@@ -1,11 +1,16 @@
 extends Node
 
 # Stamina properties
-@export var max_stamina: int = 100
-@export var stamina_regen_rate: float = 10.0  # Stamina points regenerated per second
+@export var max_stamina: float = 120.0
+@export var stamina_regen_rate_moving: float = 5.0  # Stamina points regenerated per second while moving
+@export var stamina_regen_rate_still: float = 10.0  # Stamina points regenerated per second while still
+@export var exhaustion_threshold: float = 0.5  # Threshold for removing exhaustion state
+@export var stamina_regen_rate_exhausted_modifier: float = 0.75  # Modifier for regeneration rate when exhausted
 
-var current_stamina: int
+var current_stamina: float
 var is_exhausted: bool = false
+var is_moving: bool = false
+var is_attacking: bool = false
 
 # Signals
 signal stamina_changed(current_stamina: int)
@@ -16,16 +21,33 @@ func _ready():
 
 func deplete_stamina(amount: int):
 	current_stamina = max(current_stamina - amount, 0)
-	emit_signal("stamina_changed", current_stamina)
+	emit_signal("stamina_changed", int(current_stamina))
 	if current_stamina == 0:
 		is_exhausted = true
 		emit_signal("stamina_exhausted")
 
 func regenerate_stamina(delta: float):
-	if current_stamina < max_stamina and not is_exhausted:
-		current_stamina = min(current_stamina + stamina_regen_rate * delta, max_stamina)
-		emit_signal("stamina_changed", current_stamina)
+	if current_stamina < max_stamina and not is_attacking:
+		var regen_rate = stamina_regen_rate_still if not is_moving else stamina_regen_rate_moving
+		if is_exhausted:
+			regen_rate *= stamina_regen_rate_exhausted_modifier
+		
+		# Apply regeneration
+		current_stamina = min(current_stamina + regen_rate * delta, max_stamina)
+		
+		# Reset exhaustion if stamina is above 50%
+		if is_exhausted and current_stamina >= max_stamina * exhaustion_threshold:
+			is_exhausted = false
+
+		emit_signal("stamina_changed", int(current_stamina))
+
+	
 
 func reset_exhaustion():
 	is_exhausted = false
 
+func set_moving(moving: bool):
+	is_moving = moving
+
+func set_attacking(attacking: bool):
+	is_attacking = attacking
