@@ -2,8 +2,8 @@ extends Node
 
 # Stamina properties
 @export var max_stamina: float = 120.0
-@export var stamina_regen_rate_moving: float = 5.0  # Stamina points regenerated per second while moving
-@export var stamina_regen_rate_still: float = 10.0  # Stamina points regenerated per second while still
+@export var stamina_regen_rate_moving: float = 10.0  # Stamina points regenerated per second while moving
+@export var stamina_regen_rate_still: float = 20.0  # Stamina points regenerated per second while still
 @export var exhaustion_threshold: float = 0.5  # Threshold for removing exhaustion state
 @export var stamina_regen_rate_exhausted_modifier: float = 0.75  # Modifier for regeneration rate when exhausted
 

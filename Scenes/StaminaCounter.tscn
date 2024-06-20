@@ -14,6 +14,7 @@ offset_bottom = 40.0
 script = ExtResource("1_gmxmt")
 
 [node name="Circle0" type="TextureRect" parent="Control"]
+z_index = 8
 layout_mode = 0
 offset_left = 62.0
 offset_top = 1.0
@@ -22,9 +23,11 @@ offset_bottom = 41.0
 texture = ExtResource("2_8sagi")
 
 [node name="Node2D" type="Node2D" parent="Control/Circle0"]
+z_index = 4
 script = ExtResource("3_o8rt2")
 
 [node name="Circle1" type="TextureRect" parent="Control"]
+z_index = 8
 offset_left = 22.0
 offset_top = 29.0
 offset_right = 62.0
@@ -35,6 +38,7 @@ texture = ExtResource("2_8sagi")
 script = ExtResource("3_o8rt2")
 
 [node name="Circle2" type="TextureRect" parent="Control"]
+z_index = 8
 offset_left = 1.0
 offset_top = 72.0
 offset_right = 41.0
@@ -45,6 +49,7 @@ texture = ExtResource("2_8sagi")
 script = ExtResource("3_o8rt2")
 
 [node name="Circle3" type="TextureRect" parent="Control"]
+z_index = 8
 offset_left = 1.0
 offset_top = 117.0
 offset_right = 41.0
@@ -55,6 +60,7 @@ texture = ExtResource("2_8sagi")
 script = ExtResource("3_o8rt2")
 
 [node name="Circle4" type="TextureRect" parent="Control"]
+z_index = 8
 offset_left = 21.0
 offset_top = 162.0
 offset_right = 61.0
@@ -65,6 +71,7 @@ texture = ExtResource("2_8sagi")
 script = ExtResource("3_o8rt2")
 
 [node name="Circle5" type="TextureRect" parent="Control"]
+z_index = 8
 offset_left = 61.0
 offset_top = 185.0
 offset_right = 101.0
