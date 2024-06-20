@@ -61,14 +61,16 @@ func update_stamina_visual(current_stamina: int):
 func hide_counter():
 	if tween:
 		tween.kill()
-	tween = create_tween()
-	tween.tween_property(self, "modulate:a", 0.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	if is_inside_tree():
+		tween = create_tween()
+		tween.tween_property(self, "modulate:a", 0.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 
 func show_counter():
 	if tween:
 		tween.kill()
-	tween = create_tween()
-	tween.tween_property(self, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	if is_inside_tree():
+		tween = create_tween()
+		tween.tween_property(self, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 
 func _on_player_eliminated():
 	hide_counter()
