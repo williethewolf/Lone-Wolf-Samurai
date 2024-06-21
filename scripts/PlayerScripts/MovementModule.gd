@@ -48,7 +48,10 @@ func handle_jump(_delta):
 		emit_signal("grounded_updated", is_jumping)
 	else:
 		is_jumping = true
-
+func dash():
+	print("Dashing through the snow...")
+	pass
+	
 func move_and_slide():
 	get_parent().velocity.x = direction.x * get_parent().speed
 	get_parent().move_and_slide()

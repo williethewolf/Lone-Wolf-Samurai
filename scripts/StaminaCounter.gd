@@ -73,4 +73,5 @@ func show_counter():
 		tween.tween_property(self, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 
 func _on_player_eliminated():
-	hide_counter()
+	if self.modulate.a>0.0 :
+		hide_counter()

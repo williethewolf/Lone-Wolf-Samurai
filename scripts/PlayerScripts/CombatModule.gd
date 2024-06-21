@@ -188,7 +188,7 @@ func _on_sword_hit_area_area_entered(area):
 					call_deferred("_interrupt_attack")  # Defer the attack interruption
 				else:
 					character.print_debug("sword colliding with hurtbox " + entity.player_name)
-					entity.combat_module.take_damage(attack_damage_calculator())
+					entity.combat_module.take_damage(attack_damage_calculator(),attacker_stance)
 			else:
 				character.print_debug("sword colliding with hurtbox " + entity.player_name)
 				entity.combat_module.take_damage(attack_damage_calculator())
@@ -199,18 +199,21 @@ func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
 func attack_damage_calculator():
 	return randi_range(character.damageRange[0], character.damageRange[1])
 
-func take_damage(amount: int):
+func take_damage(amount: int, attack_stance: String):
 	if is_taking_damage:
 		return # Prevent taking damage if already in the process of taking damage
 
-	stamina_module.deplete_stamina(10) #MAKE THIS A PUBLIC VARIABLE
+	
 	character.life -= amount
+	
 	if character.life <= 0:
 		# Character dies
-		character.modulate = Color(0, 0, 0)  # Turn completely black
+		character.play_death_animation(attack_stance)
+		#character.modulate = Color(0, 0, 0)  # Turn completely black
 		# Defer the freeing of the node
-		character.call_deferred("queue_free")
+		#character.call_deferred("queue_free")
 	else:
+		stamina_module.deplete_stamina(10) #MAKE THIS A PUBLIC VARIABLE
 		is_taking_damage = true
 		character.modulate = Color(1, 0, 0)  # Flash red
 		await get_tree().create_timer(0.1).timeout  # Flash duration
@@ -219,3 +222,5 @@ func take_damage(amount: int):
 
 func _interrupt_attack():
 	character.animPlayer_torso.stop()  # Stop the attack animation
+	
+

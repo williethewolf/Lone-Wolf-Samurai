@@ -1,4 +1,4 @@
-[gd_scene load_steps=147 format=3 uid="uid://cqt46glfqb27s"]
+[gd_scene load_steps=171 format=3 uid="uid://cqt46glfqb27s"]
 
 [ext_resource type="Script" path="res://scripts/PlayerScripts/character.gd" id="1_o6lj8"]
 [ext_resource type="Texture2D" uid="uid://bivbhw5o6q1je" path="res://sprites/Character_sprites/original-6c34028201504126cddc7c4c73109ad7.jpg" id="2_43g35"]
@@ -14,6 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://ceg7v7kg6vxsl" path="res://sprites/Character_sprites/top idle.png" id="12_4xksj"]
 [ext_resource type="Script" path="res://scripts/PlayerScripts/MovementModule.gd" id="13_m5k3f"]
 [ext_resource type="Script" path="res://scripts/PlayerScripts/CombatModule.gd" id="14_fgos7"]
+[ext_resource type="Texture2D" uid="uid://cf7s8t6x6jyl6" path="res://sprites/Character_sprites/FULL_BODY_death animation 1_offsetFix.png" id="15_rxofy"]
+[ext_resource type="Shader" uid="uid://crvscack4sbjy" path="res://shaders/blood.tres" id="16_m87dc"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_58rqj"]
 radius = 31.25
@@ -1553,6 +1555,296 @@ _data = {
 "walk": SubResource("Animation_apvlk")
 }
 
+[sub_resource type="Animation" id="Animation_vnw6v"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CollisionShape2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.75, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CollisionShape2D:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2DTorso/HurtboxArea/CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-2, 14)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("AnimatedSprite2DTorso/HurtboxArea/CollisionShape2D:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("BloodEmitterContainer/BloodParticleEmitter:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(13, -52)]
+}
+
+[sub_resource type="Animation" id="Animation_ksfae"]
+resource_name = "death1"
+length = 1.55556
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2DFullBody:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.111111, 0.222222, 0.333333, 0.444444, 0.555556, 0.666667, 0.777778, 0.888889, 1, 1.11111, 1.22222, 1.33333, 1.44444),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2DFullBody:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["death1"]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.4, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.75, -1), Vector2(0.75, 27)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CollisionShape2D:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.4, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 0.75)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("AnimatedSprite2DTorso/HurtboxArea/CollisionShape2D:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.4, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-2, 14), Vector2(-2, 39.6)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("AnimatedSprite2DTorso/HurtboxArea/CollisionShape2D:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.4, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.25, 0.8)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("BloodEmitterContainer/BloodParticleEmitter:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.6, 0.8, 1, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(-46, -51), Vector2(-28, -44), Vector2(0, -6), Vector2(23, -10), Vector2(33, 6)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7wqw0"]
+_data = {
+"RESET": SubResource("Animation_vnw6v"),
+"death1": SubResource("Animation_ksfae")
+}
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwbj2"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(0, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8du0j"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(288, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ykx2r"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(576, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxwi5"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(864, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sguta"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1152, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s6kq2"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1440, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x1u1k"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1728, 0, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_im70n"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(0, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rgdn3"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(288, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6sqsa"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(576, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_33u8r"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(864, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ue200"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1152, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ekf34"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1440, 288, 288, 288)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5kp2s"]
+atlas = ExtResource("15_rxofy")
+region = Rect2(1728, 288, 288, 288)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_r0whd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bwbj2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8du0j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ykx2r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxwi5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sguta")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s6kq2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x1u1k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_im70n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rgdn3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6sqsa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_33u8r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ue200")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ekf34")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5kp2s")
+}],
+"loop": true,
+"name": &"death1",
+"speed": 9.0
+}]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eig14"]
+shader = ExtResource("16_m87dc")
+
+[sub_resource type="Curve" id="Curve_vj3bd"]
+_data = [Vector2(0, 0.317193), 0.0, 0.0, 0, 0, Vector2(0.481728, 0.813295), 0.0, 0.0, 0, 0, Vector2(1, 0.306525), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_8mfa0"]
+curve = SubResource("Curve_vj3bd")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vrbd5"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_max = 360.0
+direction = Vector3(3.09, -3.1, 0)
+spread = 5.0
+initial_velocity_min = 200.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 500, 0)
+linear_accel_min = 20.0
+linear_accel_max = 40.0
+scale_max = 10.0
+scale_curve = SubResource("CurveTexture_8mfa0")
+turbulence_noise_strength = 0.0
+turbulence_noise_scale = 0.005
+
 [node name="character" type="CharacterBody2D"]
 z_index = 1
 script = ExtResource("1_o6lj8")
@@ -1562,7 +1854,6 @@ position = Vector2(0.75, -1)
 shape = SubResource("CapsuleShape2D_58rqj")
 
 [node name="AnimatedSprite2DLegs" type="AnimatedSprite2D" parent="."]
-position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_c6t04")
 animation = &"idle_legs"
 
@@ -1619,5 +1910,31 @@ script = ExtResource("13_m5k3f")
 
 [node name="CombatModule" type="Node" parent="."]
 script = ExtResource("14_fgos7")
+
+[node name="FullBodyAnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_7wqw0")
+}
+
+[node name="AnimatedSprite2DFullBody" type="AnimatedSprite2D" parent="."]
+position = Vector2(-1, -55)
+scale = Vector2(1.21528, 1.15972)
+sprite_frames = SubResource("SpriteFrames_r0whd")
+animation = &"death1"
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="AnimatedSprite2DFullBody"]
+position = Vector2(0.822856, 47.4252)
+scale = Vector2(0.822856, 0.862277)
+remote_path = NodePath("../../BloodEmitterContainer")
+update_position = false
+
+[node name="BloodEmitterContainer" type="Node2D" parent="."]
+scale = Vector2(1, 1)
+
+[node name="BloodParticleEmitter" type="GPUParticles2D" parent="BloodEmitterContainer"]
+material = SubResource("ShaderMaterial_eig14")
+position = Vector2(13, -52)
+amount = 500
+process_material = SubResource("ParticleProcessMaterial_vrbd5")
 
 [connection signal="area_entered" from="AnimatedSprite2DTorso/SwordHitArea" to="CombatModule" method="_on_sword_hit_area_area_entered"]
