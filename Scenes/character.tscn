@@ -2058,7 +2058,8 @@ shape = SubResource("CapsuleShape2D_58rqj")
 
 [node name="AnimatedSprite2DLegs" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_c6t04")
-animation = &"idle_legs"
+animation = &"jump_up"
+frame = 7
 
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
@@ -2158,9 +2159,12 @@ emitting = false
 amount = 600
 process_material = SubResource("ParticleProcessMaterial_5r03k")
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+[node name="FloorBloodLightOccluder2D" type="LightOccluder2D" parent="."]
 position = Vector2(-55, -69)
 occluder = SubResource("OccluderPolygon2D_24d6n")
 occluder_light_mask = 4
+
+[node name="FloorDetectionRayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 163)
 
 [connection signal="area_entered" from="AnimatedSprite2DTorso/SwordHitArea" to="CombatModule" method="_on_sword_hit_area_area_entered"]

@@ -10,7 +10,9 @@ const RIGHT = Vector2(1, 0)
 @export var gravity: float = 5500.0  # Increased gravity strength
 @export var jump_speed: float = -1500.0  # Increased initial jump speed (more negative to move up faster)
 @export var jump_duration: float = 0.3  # Duration to reach full jump height
-var floor_y_position: float = 10
+
+#Floor detection raycast
+@onready var floorRaycast = $"../FloorDetectionRayCast2D"
 
 # Movement variables
 var direction = Vector2.ZERO
@@ -57,7 +59,7 @@ func jump():
 	emit_signal("grounded_updated", is_jumping)
 
 func is_close_to_floor() -> bool:
-	return get_parent().position.y + 75 >= floor_y_position  # Adjust this threshold as needed
+	return floorRaycast.is_colliding()
 
 func handle_jump(_delta):
 	if get_parent().is_on_floor():
