@@ -15,6 +15,11 @@ var combat_module: Node
 var jump_pressed_duration = 0.0  # Duration for which the jump button is pressed
 var jump_duration: float = 0.05  # Duration to reach full jump height
 
+# Double-tap detection
+var last_tap_time_left = 0
+var last_tap_time_right = 0
+var double_tap_interval = 0.3
+
 func _ready():
 	character = get_node_or_null(character_path) as Character
 	if not character:
@@ -40,18 +45,24 @@ func handle_input():
 			movement_module.direction += movement_module.RIGHT
 
 		if Input.is_action_just_pressed(controls.move_left):
-			if Time.get_ticks_msec() / 1000.0 - character.last_tap_time_left < character.double_tap_interval:
+			if Time.get_ticks_msec() / 1000.0 - last_tap_time_left < double_tap_interval:
 				movement_module.facing = movement_module.LEFT
-				character.legs_sprite.scale.x = -1
-				character.torso_sprite.scale.x = -1
-			character.last_tap_time_left = Time.get_ticks_msec() / 1000.0
-
+				character.full_body_sprite.scale.x = -1
+				movement_module.run()
+			last_tap_time_left = Time.get_ticks_msec() / 1000.0
 		if Input.is_action_just_pressed(controls.move_right):
-			if Time.get_ticks_msec() / 1000.0 - character.last_tap_time_right < character.double_tap_interval:
+			if Time.get_ticks_msec() / 1000.0 - last_tap_time_right < double_tap_interval:
 				movement_module.facing = movement_module.RIGHT
-				character.legs_sprite.scale.x = 1
-				character.torso_sprite.scale.x = 1
-			character.last_tap_time_right = Time.get_ticks_msec() / 1000.0
+				character.full_body_sprite.scale.x = 1
+				movement_module.run()
+			last_tap_time_right = Time.get_ticks_msec() / 1000.0
+		
+		#COMMENTED UNTIL DASH IMPLEMENTED
+		#if Input.is_action_just_pressed(controls.dash):
+		#	movement_module.dash()
+
+		if Input.is_action_just_released(controls.move_left) or Input.is_action_just_released(controls.move_right):
+			movement_module.stop_run()
 
 		if Input.is_action_just_pressed(controls.dash):
 			movement_module.dash()
@@ -62,9 +73,10 @@ func handle_input():
 			jump_pressed_duration = clamp(jump_pressed_duration, 0.0, jump_duration)
 			var jump_ratio = jump_pressed_duration / jump_duration
 			character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
-			#movement_module.is_jumping = false
+
 		character.handle_target_switch()
 	if combat_module and is_instance_valid(combat_module):
 		combat_module.handle_stance_change()
 		combat_module.handle_attacks()
+
 		

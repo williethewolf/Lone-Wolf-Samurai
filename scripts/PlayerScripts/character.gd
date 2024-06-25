@@ -20,11 +20,6 @@ var current_stance = "Mid"
 @export var controls: Resource = null
 
 
-# Double-tap detection
-var last_tap_time_left = 0
-var last_tap_time_right = 0
-var double_tap_interval = 0.3
-
 # Reference to the AnimationPlayer nodes
 @onready var animPlayer_legs = $LegsAnimationPlayer
 @onready var animPlayer_torso = $TorsoAnimationPlayer
@@ -48,7 +43,8 @@ var current_torso_animation = ""
 #Blood emitter
 @onready var blood_emitter = $BloodEmitterContainer/BloodParticleEmitter
 @onready var emitter_original_position = $BloodEmitterContainer.position.y
-var tween
+@onready var slashblood_emitter = $BloodSlashEmitterContainer/BloodSlashParticleEmitter
+var tween: Tween
 
 #Modules
 @onready var stamina_module = $StaminaModule
@@ -65,12 +61,14 @@ func _ready():
 	animPlayer_legs.play("idle_legs")
 	full_body_sprite.visible = false
 	blood_emitter.emitting = false
+	slashblood_emitter.emitting= false
 	update_torso_animation()
 	animPlayer_legs.connect("animation_finished", Callable(self, "_on_legs_animation_player_animation_finished"))
 	animPlayer_torso.connect("animation_finished", Callable(self, "_on_torso_animation_player_animation_finished"))
 	movement_module.connect("grounded_updated", Callable(self, "_on_grounded_updated"))
 	stamina_module.connect("stamina_changed", Callable(self, "_on_stamina_changed"))
 	stamina_module.connect("stamina_exhausted", Callable(self, "_on_stamina_exhausted"))
+	stamina_module.connect("exhausted_changed", Callable(movement_module, "_on_exhausted_changed"))
 
 
 func _physics_process(delta):
@@ -78,6 +76,8 @@ func _physics_process(delta):
 	movement_module.apply_gravity(delta)
 	movement_module.move_and_slide()
 	movement_module.handle_jump(delta)
+	#for stamina while running calculation
+	movement_module._physics_process(delta)
 	
 	update_facing_direction()  # Update facing direction based on raycast
 	update_animation()  # This is called every frame to update animations
@@ -88,7 +88,6 @@ func _physics_process(delta):
 	stamina_module.regenerate_stamina(delta)
 	
 	#Debug
-
 # Combat-related functions
 
 func update_facing_direction():
@@ -201,9 +200,7 @@ func blood_emitter_offset(current_attack_stance):
 	elif current_attack_stance == "Low":
 		cut_offset = 40.0  # Even lower
 
-	print("Cut offset: ", cut_offset)
 	$BloodEmitterContainer.position.y += cut_offset
-	print("BloodEmitterContainer new position: ", $BloodEmitterContainer.position)
 
 func fluctuate_particle_emission(current_attack_stance):
 	$BloodEmitterContainer.position.y = emitter_original_position
@@ -215,11 +212,13 @@ func fluctuate_particle_emission(current_attack_stance):
 	# Set the direction with calculated variance
 	blood_emitter.process_material.direction = Vector3(base_x, base_y, 0)
 	
-	var iterations = randi_range(3, 7)
+	var iterations = randi_range(1, 7)
 	var initial_max_velocity = blood_emitter.process_material.initial_velocity_min
 	var custom_max_velocity = 80
+	if tween:
+		tween.kill()
+	tween = create_tween()
 	for i in range(iterations):
-		tween = create_tween()
 		var decrease_time = randf_range(0.2, 0.7)
 		var increase_time = randf_range(0.3, 1.0)
 		var max_value = 1.0 / (i + 1)  # Calculate the max value for each iteration
@@ -230,13 +229,36 @@ func fluctuate_particle_emission(current_attack_stance):
 			blood_emitter.process_material.initial_velocity_min = randf_range(custom_max_velocity, initial_max_velocity)
 		if tween:
 			tween.kill()
-			tween = create_tween()
-			# Tween to increase emission to a max value
-			tween.tween_property(blood_emitter, "amount_ratio", max_value, increase_time)
-			# Tween to decrease emission to 0
-			tween.tween_property(blood_emitter, "amount_ratio", 0.0, decrease_time)
-			await tween.finished
+		tween = create_tween()
+		# Tween to increase emission to a max value
+		tween.tween_property(blood_emitter, "amount_ratio", max_value, increase_time)
+		# Tween to decrease emission to 0
+		tween.tween_property(blood_emitter, "amount_ratio", 0.0, decrease_time)
+		await tween.finished
 	blood_emitter.emitting = false
+	
+func blood_slash_splatter(current_attack_stance):
+	var slashtween = create_tween()
+	if current_attack_stance == "Low":
+		slashblood_emitter.process_material.direction = Vector3(-20, -30, 0)
+	elif current_attack_stance == "Mid":
+		slashblood_emitter.process_material.direction = Vector3(0, 5, 0)
+	elif current_attack_stance == "Top":
+		slashblood_emitter.process_material.direction = Vector3(-5, 60, 0)
+	
+	var decrease_time = randf_range(0.1, 0.2)
+	var increase_time = 0
+	if slashtween:
+		slashtween.kill()
+		slashtween = create_tween()
+		slashblood_emitter.emitting = true
+		# Tween to increase emission to a max value
+		slashtween.tween_property(slashblood_emitter, "amount_ratio", 1.1, increase_time)
+		# Tween to decrease emission to 0
+		slashtween.tween_property(slashblood_emitter, "amount_ratio", 0.0, decrease_time)
+		await slashtween.finished
+	slashblood_emitter.emitting = false
+	
 func update_torso_animation():
 	if combat_module and is_instance_valid(combat_module):
 		if not combat_module.is_attacking:
@@ -256,10 +278,27 @@ func update_torso_animation():
 				current_torso_animation = new_animation
 				animPlayer_torso.play(new_animation)
 
+func play_run_animation():
+	legs_sprite.visible = false
+	torso_sprite.visible = false
+	full_body_sprite.visible = true
+	animPlayer_full_body.play("running")
+
+func stop_run_animation():
+	full_body_sprite.visible = false
+	legs_sprite.visible = true
+	torso_sprite.visible = true
+	update_torso_animation()
+	update_leg_animation()
+
+
 func update_animation():
 	if combat_module and is_instance_valid(combat_module):
-		if movement_module.is_dashing:
-			legs_sprite.play("dash")
+		if movement_module.is_running:
+			#animPlayer_torso.play("attack_" + current_stance)
+			animPlayer_legs.play("running")
+		elif movement_module.is_dashing:
+			animPlayer_legs.play("dash")
 		else:
 			update_leg_animation()
 		if not combat_module.is_attacking:
@@ -324,8 +363,8 @@ func _on_stamina_changed(current_stamina: int):
 	pass
 
 func _on_stamina_exhausted():
+	movement_module.stop_run()
 	# Handle stamina exhaustion (e.g., prevent attacking or dashing)
-	pass
 
 
 

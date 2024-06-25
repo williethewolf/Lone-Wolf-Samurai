@@ -193,6 +193,18 @@ p2_stanceMidL={
 ]
 }
 
+[layer_names]
+
+2d_render/layer_1="world"
+2d_render/layer_2="Player"
+2d_render/layer_3="Enemies"
+2d_render/layer_4="blood"
+2d_physics/layer_1="World"
+2d_physics/layer_2="Players"
+2d_physics/layer_3="Enemies"
+2d_physics/layer_4="Blood"
+2d_physics/layer_5="Pickups"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

@@ -15,19 +15,24 @@ var is_attacking: bool = false
 # Signals
 signal stamina_changed(current_stamina: int)
 signal stamina_exhausted()
+signal exhausted_changed(is_exhausted: bool)
+
+@onready var movement_module = get_parent().get_node("MovementModule")
 
 func _ready():
 	current_stamina = max_stamina
+	
 
 func deplete_stamina(amount: int):
 	current_stamina = max(current_stamina - amount, 0)
-	emit_signal("stamina_changed", int(current_stamina))
-	if current_stamina == 0:
+	if current_stamina <= 0:
 		is_exhausted = true
+		emit_signal("exhausted_changed", true)
 		emit_signal("stamina_exhausted")
+	emit_signal("stamina_changed", current_stamina)
 
 func regenerate_stamina(delta: float):
-	if current_stamina < max_stamina and not is_attacking:
+	if current_stamina < max_stamina and not is_attacking and not movement_module.is_running:
 		var regen_rate = stamina_regen_rate_still if not is_moving else stamina_regen_rate_moving
 		if is_exhausted:
 			regen_rate *= stamina_regen_rate_exhausted_modifier
@@ -38,9 +43,9 @@ func regenerate_stamina(delta: float):
 		# Reset exhaustion if stamina is above 50%
 		if is_exhausted and current_stamina >= max_stamina * exhaustion_threshold:
 			is_exhausted = false
+			emit_signal("exhausted_changed", false)
 
 		emit_signal("stamina_changed", int(current_stamina))
-
 	
 
 func reset_exhaustion():
@@ -51,3 +56,6 @@ func set_moving(moving: bool):
 
 func set_attacking(attacking: bool):
 	is_attacking = attacking
+	
+func _on_stamina_exhausted():
+	emit_signal("exhausted_changed", true)

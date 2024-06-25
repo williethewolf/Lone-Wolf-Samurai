@@ -41,6 +41,7 @@ var attack_animation_lengths = {
 var attack_start_time = 0.0
 
 @onready var stamina_module = $"../StaminaModule"
+@onready var movement_module = $"../MovementModule"
 
 func _ready():
 	character = $".."
@@ -182,19 +183,23 @@ func _on_sword_hit_area_area_entered(area):
 			var attacker_stance = current_attack_stance
 			var defender_stance = entity.current_stance  # Assuming the defender also has current_stance variable
 			if character.is_facing_each_other(entity):
-				if is_blocked(attacker_stance, defender_stance):
+				if is_blocked(attacker_stance, defender_stance) and not movement_module.is_running:
 					character.print_debug(attacker_stance + " attack blocked by " + entity.player_name)
+					stamina_module.deplete_stamina(25)
+					entity.stamina_module.deplete_stamina(-5)  # Hackish but it is giving 5 points of stamina to the blocker and that's why the attack costs 25 instead of 20
 					is_attack_blocked = true  # Set the attack blocked flag
 					call_deferred("_interrupt_attack")  # Defer the attack interruption
 				else:
 					character.print_debug("sword colliding with hurtbox " + entity.player_name)
-					entity.combat_module.take_damage(attack_damage_calculator(),attacker_stance)
+					entity.combat_module.take_damage(attack_damage_calculator(), attacker_stance)
+					entity.blood_slash_splatter(attacker_stance)
 			else:
 				character.print_debug("sword colliding with hurtbox " + entity.player_name)
-				entity.combat_module.take_damage(attack_damage_calculator())
+				entity.combat_module.take_damage(attack_damage_calculator(), attacker_stance)
+				entity.blood_slash_splatter(attacker_stance)
 
 func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
-	return attacker_stance == defender_stance
+	return attacker_stance == defender_stance and not movement_module.is_running
 
 func attack_damage_calculator():
 	return randi_range(character.damageRange[0], character.damageRange[1])
@@ -208,6 +213,7 @@ func take_damage(amount: int, attack_stance: String):
 	
 	if character.life <= 0:
 		# Character dies
+		character.current_stance="null"
 		character.play_death_animation(attack_stance)
 		#character.modulate = Color(0, 0, 0)  # Turn completely black
 		# Defer the freeing of the node
@@ -222,5 +228,6 @@ func take_damage(amount: int, attack_stance: String):
 
 func _interrupt_attack():
 	character.animPlayer_torso.stop()  # Stop the attack animation
+
 	
 

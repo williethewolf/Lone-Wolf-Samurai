@@ -1,3 +1,4 @@
+# SphereNode2D.gd
 extends Node2D
 
 var fill_amount: float = 0.0
@@ -11,7 +12,7 @@ func _draw():
 	var fill_radius = radius * fill_amount
 
 	# Draw the filled portion of the circle
-	draw_circle(center, fill_radius, Color(1, 1, 1, 0.4 + 0.6 * fill_amount))
+	draw_circle(center, fill_radius, modulate)
 
 func update_fill(amount: float):
 	fill_amount = amount

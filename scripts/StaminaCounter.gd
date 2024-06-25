@@ -28,7 +28,9 @@ func _ready():
 	if stamina_module:
 		stamina_module.connect("stamina_changed", Callable(self, "_on_stamina_changed"))
 		stamina_module.connect("stamina_exhausted", Callable(self, "_on_stamina_exhausted"))
+		stamina_module.connect("exhausted_changed", Callable(self, "_on_exhausted_changed"))  # Connect the new signal
 		_on_stamina_changed(stamina_module.current_stamina)  # Initialize the visual state
+
 
 	if player:
 		player.connect("tree_exited", Callable(self, "_on_player_eliminated"))
@@ -41,6 +43,12 @@ func _on_stamina_changed(current_stamina: int):
 		hide_counter()
 	else:
 		show_counter()
+
+func _on_exhausted_changed(is_exhausted: bool):
+	if is_exhausted:
+		modulate = Color(1, 0.5, 0, 1)  # Orange
+	else:
+		modulate = Color(1, 1, 1, 1)  # White
 
 func _on_stamina_exhausted():
 	# Handle exhaustion visual feedback if needed
@@ -56,7 +64,7 @@ func update_stamina_visual(current_stamina: int):
 		if fill_amount >= 1.0:
 			sphere.modulate.a = 1.0  # Full opacity
 		else:
-			sphere.modulate.a = 0.4  # Low opacity
+			sphere.modulate.a = 0.6  # Low opacity
 
 func hide_counter():
 	if tween:
