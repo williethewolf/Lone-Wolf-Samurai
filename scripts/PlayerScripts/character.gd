@@ -313,7 +313,7 @@ func update_leg_animation():
 			movement_module.is_falling = false
 		elif movement_module.is_close_to_floor() and velocity.y <0:
 			animPlayer_legs.play("jump_down")
-			#movement_module.is_falling = true
+			movement_module.is_falling = true
 	elif movement_module.direction == Vector2.ZERO or velocity.length() < threshold:
 		animPlayer_legs.play("idle_legs")  # Ensure legs go back to idle when not moving
 	else:
