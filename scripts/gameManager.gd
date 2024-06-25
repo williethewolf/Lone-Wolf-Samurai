@@ -1,32 +1,32 @@
 extends Node2D
 
-@onready var distance = 0
-@onready var levelScene = get_tree().get_nodes_in_group("Level")[0]  # Get the first node in the "level" group
-@onready var level = levelScene.get_node("Map/TileMap")
-@onready var floorLine = levelScene.get_node("Map/Floorline")
+@onready var distance : float = 0
+@onready var levelScene : Node = get_tree().get_nodes_in_group("Level")[0]  # Get the first node in the "level" group
+@onready var level : Node = levelScene.get_node("Map/TileMap")
+@onready var floorLine : Node = levelScene.get_node("Map/Floorline")
 
 @onready var line := get_node("ColorRect")
 
 var floorLineCoords := Vector2.ZERO
-var distanceToFloorline
-var tween
-var is_multiplayer_camera_active = false
+var distanceToFloorline : float
+var tween : Tween
+var is_multiplayer_camera_active : bool = false
 
-signal distance_to_floor(distance_to_floorline)
+signal distance_to_floor(distance_to_floorline : float)
 
 @onready var players := {}
 
-@onready var multiplayer_camera := get_node("SubViewportContainer3/SubViewport/MultiplayerCamera")
-@onready var multiplayer_viewport_container := get_node("SubViewportContainer3")
+@onready var multiplayer_camera : Node = get_node("SubViewportContainer3/SubViewport/MultiplayerCamera")
+@onready var multiplayer_viewport_container : Node = get_node("SubViewportContainer3")
 
-func _ready():
+func _ready() -> void:
 	floorLineCoords = floorLine.global_position
 	print("Floorline global position:", floorLineCoords)
 	# Gather players into a dictionary
 	populate_players()
 
 	# Set up remote transforms and signals
-	for node in players.values():
+	for node : Dictionary in players.values():
 		var remote_transform := RemoteTransform2D.new()
 		remote_transform.remote_path = node["camera"].get_path()
 		node["player"].get_node("character").add_child(remote_transform)
@@ -39,19 +39,19 @@ func _ready():
 		players[2]["viewport"].world_2d = players[1]["viewport"].world_2d
 		print("Synchronized viewports for Player 2")
 
-func populate_players():
+func populate_players() -> void:
 	# Gather players into a dictionary
 	for player in get_tree().get_nodes_in_group("players"):
-		var player_number = player.get("player_number")
+		var player_number : int = player.get("player_number")
 		print("Found player with number: " + str(player_number))
 
 		# Construct the correct path for the SubViewportContainer and SubViewport nodes
-		var sub_viewport_container_path = "HBoxContainer/SubViewportContainer" + str(player_number)
-		var sub_viewport_container = get_node(sub_viewport_container_path)
+		var sub_viewport_container_path := "HBoxContainer/SubViewportContainer" + str(player_number)
+		var sub_viewport_container := get_node(sub_viewport_container_path)
 		
 		if sub_viewport_container:
-			var viewport = sub_viewport_container.get_node("SubViewport")
-			var camera = viewport.get_node("Player" + str(player_number) + "Camera")
+			var viewport :  Node = sub_viewport_container.get_node("SubViewport")
+			var camera : Node = viewport.get_node("Player" + str(player_number) + "Camera")
 			
 			# Add the player information to the dictionary
 			players[player_number] = {
@@ -64,20 +64,22 @@ func populate_players():
 		else:
 			print("SubViewportContainer not found for player " + str(player_number))
 
-func _physics_process(_delta):
+func _physics_process(_delta : float) -> void:
 	if players.has(1) and players.has(2):
-		var player1_pos
-		var player2_pos
+		var player1_pos : Vector2
+		var player2_pos : Vector2
 		
 		if players[1] and players[1]["player"] and is_instance_valid(players[1]["player"].get_node_or_null("character")):
 			player1_pos = players[1]["player"].get_node("character").global_position
 		else:
-			player1_pos = null
+			#player1_pos = null
+			player1_pos = Vector2.ZERO
 		
 		if players[2] and players[2]["player"] and is_instance_valid(players[2]["player"].get_node_or_null("character")):
 			player2_pos = players[2]["player"].get_node("character").global_position
 		else:
-			player2_pos = null
+			#player2_pos = null
+			player2_pos = Vector2.ZERO
 		
 		if player1_pos and player2_pos:
 			distance = player1_pos.distance_to(player2_pos)
@@ -89,9 +91,9 @@ func _physics_process(_delta):
 				#print("They are NOT close")
 				switch_to_individual_cameras()
 
-		for player_number in players.keys():
-			var node = players[player_number]
-			var player_pos
+		for player_number : int in players.keys():
+			var node : Dictionary = players[player_number]
+			var player_pos : Vector2
 			if node and node["player"] and is_instance_valid(node["player"].get_node_or_null("character")):
 				player_pos = node["player"].get_node("character").global_position
 				distanceToFloorline = round(abs(player_pos.y - floorLineCoords.y + 88))  # Add offset to normalize
@@ -103,7 +105,7 @@ func _physics_process(_delta):
 			# Update the line thickness even if there's only one player left
 			update_line_thickness(distance)
 
-func switch_to_multiplayer_camera():
+func switch_to_multiplayer_camera() -> void:
 	# Set both players to use the same world
 	if players.has(1):
 		players[1]["viewport"].world_2d = multiplayer_camera.get_viewport().world_2d
@@ -125,7 +127,7 @@ func switch_to_multiplayer_camera():
 	# Disable individual viewport containers
 	tween.tween_callback(individualViewportEnabler.bind(false))
 
-func switch_to_individual_cameras():
+func switch_to_individual_cameras() -> void:
 	# Revert viewports to their original world
 	if players.has(1):
 		players[1]["viewport"].world_2d = players[1]["camera"].get_viewport().world_2d
@@ -143,12 +145,12 @@ func switch_to_individual_cameras():
 		tween.parallel().tween_property(players[2]["sub_viewport_container"], "modulate:a", 1.0, 0.3)
 	tween.tween_callback(multiplayerViewportEnabler.bind(false))
 
-func multiplayerViewportEnabler(state):
+func multiplayerViewportEnabler(state : bool) -> void:
 	multiplayer_viewport_container.visible = state
 	if state == true:
 		multiplayer_viewport_container.modulate.a = 1
 
-func individualViewportEnabler(state):
+func individualViewportEnabler(state : bool) -> void:
 	if players.has(1):
 		players[1]["sub_viewport_container"].visible = state
 	if players.has(2):
@@ -159,6 +161,6 @@ func individualViewportEnabler(state):
 		if players.has(2):
 			players[2]["sub_viewport_container"].modulate.a = 0
 
-func update_line_thickness(distanceBetweenPlayers):
-	var target_thickness = lerp(4, 0, clamp((700 - distanceBetweenPlayers) / 50, 0, 1))  # Adjust these values for thickness range
+func update_line_thickness(distanceBetweenPlayers : float) -> void:
+	var target_thickness : float = lerp(4, 0, clamp((700 - distanceBetweenPlayers) / 50, 0, 1))  # Adjust these values for thickness range
 	line.size.x = target_thickness

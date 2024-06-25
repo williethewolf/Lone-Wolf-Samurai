@@ -1,29 +1,29 @@
 extends Node
 
 # Stamina properties
-@export var max_stamina: float = 120.0
-@export var stamina_regen_rate_moving: float = 10.0  # Stamina points regenerated per second while moving
-@export var stamina_regen_rate_still: float = 20.0  # Stamina points regenerated per second while still
-@export var exhaustion_threshold: float = 0.5  # Threshold for removing exhaustion state
-@export var stamina_regen_rate_exhausted_modifier: float = 0.75  # Modifier for regeneration rate when exhausted
+@export var max_stamina : float = 120.0
+@export var stamina_regen_rate_moving : float = 10.0  # Stamina points regenerated per second while moving
+@export var stamina_regen_rate_still : float = 20.0  # Stamina points regenerated per second while still
+@export var exhaustion_threshold : float = 0.5  # Threshold for removing exhaustion state
+@export var stamina_regen_rate_exhausted_modifier : float = 0.75  # Modifier for regeneration rate when exhausted
 
-var current_stamina: float
-var is_exhausted: bool = false
-var is_moving: bool = false
-var is_attacking: bool = false
+var current_stamina : float
+var is_exhausted : bool = false
+var is_moving : bool = false
+var is_attacking : bool = false
 
 # Signals
 signal stamina_changed(current_stamina: int)
 signal stamina_exhausted()
 signal exhausted_changed(is_exhausted: bool)
 
-@onready var movement_module = get_parent().get_node("MovementModule")
+@onready var movement_module : Node = get_parent().get_node("MovementModule")
 
-func _ready():
+func _ready() -> void :
 	current_stamina = max_stamina
 	
 
-func deplete_stamina(amount: int):
+func deplete_stamina(amount : int) -> void :
 	current_stamina = max(current_stamina - amount, 0)
 	if current_stamina <= 0:
 		is_exhausted = true
@@ -31,9 +31,9 @@ func deplete_stamina(amount: int):
 		emit_signal("stamina_exhausted")
 	emit_signal("stamina_changed", current_stamina)
 
-func regenerate_stamina(delta: float):
+func regenerate_stamina(delta : float) -> void :
 	if current_stamina < max_stamina and not is_attacking and not movement_module.is_running:
-		var regen_rate = stamina_regen_rate_still if not is_moving else stamina_regen_rate_moving
+		var regen_rate : float = stamina_regen_rate_still if not is_moving else stamina_regen_rate_moving
 		if is_exhausted:
 			regen_rate *= stamina_regen_rate_exhausted_modifier
 		
@@ -48,14 +48,14 @@ func regenerate_stamina(delta: float):
 		emit_signal("stamina_changed", int(current_stamina))
 	
 
-func reset_exhaustion():
+func reset_exhaustion() -> void :
 	is_exhausted = false
 
-func set_moving(moving: bool):
+func set_moving(moving : bool) -> void :
 	is_moving = moving
 
-func set_attacking(attacking: bool):
+func set_attacking(attacking : bool) -> void :
 	is_attacking = attacking
 	
-func _on_stamina_exhausted():
+func _on_stamina_exhausted() -> void :
 	emit_signal("exhausted_changed", true)

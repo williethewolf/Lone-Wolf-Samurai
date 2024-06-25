@@ -12,15 +12,15 @@ var combat_module: Node
 #Jumping vars
 @export var jump_height: float = 200.0  # Jump height in pixels
 @export var min_jump_height: float = 20.0  # Minimum jump height in pixels
-var jump_pressed_duration = 0.0  # Duration for which the jump button is pressed
+var jump_pressed_duration : float= 0.0  # Duration for which the jump button is pressed
 var jump_duration: float = 0.05  # Duration to reach full jump height
 
 # Double-tap detection
-var last_tap_time_left = 0
-var last_tap_time_right = 0
-var double_tap_interval = 0.3
+var last_tap_time_left : float = 0
+var last_tap_time_right : float = 0
+var double_tap_interval : float = 0.3
 
-func _ready():
+func _ready() -> void:
 	character = get_node_or_null(character_path) as Character
 	if not character:
 		print("Player " + str(player_number) + " node not found!")
@@ -32,11 +32,11 @@ func _ready():
 	#makes sure it is part of the players group
 	add_to_group("players")
 
-func _process(_delta):
+func _process(_delta : float) -> void:
 	if character and is_instance_valid(character):
 		handle_input()
 
-func handle_input():
+func handle_input() -> void:
 	if character and is_instance_valid(character):
 		movement_module.direction = Vector2.ZERO
 		if Input.is_action_pressed(controls.move_left):
@@ -71,10 +71,11 @@ func handle_input():
 			movement_module.jump()
 		elif Input.is_action_just_released("jump") and movement_module.is_jumping:
 			jump_pressed_duration = clamp(jump_pressed_duration, 0.0, jump_duration)
-			var jump_ratio = jump_pressed_duration / jump_duration
+			var jump_ratio : float = jump_pressed_duration / jump_duration
 			character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
 
 		character.handle_target_switch()
+		
 	if combat_module and is_instance_valid(combat_module):
 		combat_module.handle_stance_change()
 		combat_module.handle_attacks()

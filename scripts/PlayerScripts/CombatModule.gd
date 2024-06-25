@@ -4,49 +4,49 @@ extends Node
 var character: Character
 
 # Unseath variables
-var sword_sheathed = true
+var sword_sheathed : bool = true
 
 # Attack in progress flag
-var is_attacking = false
-var next_stance = ""
-var stance_button_held = false
-var is_midSwing_complete = false
+var is_attacking : bool = false
+var next_stance : String = ""
+var stance_button_held : bool = false
+var is_midSwing_complete : bool = false
 
 # Attack variables for signals to AI and impact logic
-var current_attack_stance = ""
-var is_attack_blocked = false
+var current_attack_stance : String = ""
+var is_attack_blocked : bool = false
 # Signals
 signal stance_changed(new_stance: String)
 signal attack_stance_changed(new_attack_stance: String)
 
 # Receiving damage flags
-var is_taking_damage = false
+var is_taking_damage : bool = false
 
-var is_engaged = false
+var is_engaged : bool = false
 
 # To manage engagement
-var enemies_in_range = []
+var enemies_in_range : Array = []
 
 # Cooldown timers
-var attack_cooldown = false
-var stance_change_cooldown = false
+var attack_cooldown : bool = false
+var stance_change_cooldown : bool = false
 
-var attack_animation_lengths = {
+var attack_animation_lengths : Dictionary = {
 	"Top": 0.18,  # Top attack animation length
 	"Mid": 0.18,  # Mid attack animation length
 	"Low": 0.18,  # Low attack animation length
 }
 
 # Time tracking
-var attack_start_time = 0.0
+var attack_start_time : float = 0.0
 
-@onready var stamina_module = $"../StaminaModule"
-@onready var movement_module = $"../MovementModule"
+@onready var stamina_module : Node = $"../StaminaModule"
+@onready var movement_module : Node = $"../MovementModule"
 
-func _ready():
+func _ready() -> void:
 	character = $".."
 # Handle stance change
-func handle_stance_change():
+func handle_stance_change() -> void:
 	if stance_change_cooldown:
 		return  # Prevent stance change during cooldown
 
@@ -73,7 +73,7 @@ func handle_stance_change():
 		character.update_torso_animation()
 
 # Handle attacks
-func handle_attacks():
+func handle_attacks() -> void:
 	if attack_cooldown:
 		return  # Prevent attacks during cooldown
 
@@ -85,7 +85,7 @@ func handle_attacks():
 		perform_attack("Low")
 
 # Perform attack
-func perform_attack(attack_stance) -> void:
+func perform_attack(attack_stance : String) -> void:
 	if is_attacking or stamina_module.is_exhausted:
 		return  # Prevent starting a new attack if already attacking
 	stamina_module.deplete_stamina(20) #MAKE THIS A PUBLIC VARIABLE
@@ -94,7 +94,7 @@ func perform_attack(attack_stance) -> void:
 	emit_signal("attack_stance_changed", attack_stance)  # Emit signal for attack stance change
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
-	var penalty_duration = character.stance_penalty_duration
+	var penalty_duration : float = character.stance_penalty_duration
 
 	current_attack_stance = attack_stance # Set the global attack stance
 
@@ -134,7 +134,7 @@ func perform_attack(attack_stance) -> void:
 		character.animPlayer_torso.play("attack3")
 
 	# Wait for the duration of the animation before allowing another attack
-	var attack_duration = attack_animation_lengths[attack_stance]
+	var attack_duration : float = attack_animation_lengths[attack_stance]
 	await get_tree().create_timer(attack_duration).timeout
 
 	if is_attack_blocked:
@@ -148,13 +148,13 @@ func perform_attack(attack_stance) -> void:
 	is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
 	character.update_torso_animation()
 
-func _apply_block_penalty():
+func _apply_block_penalty() -> void:
 	stance_change_cooldown = true  # Start stance change cooldown
 	await get_tree().create_timer(character.stance_penalty_duration).timeout
 	stance_change_cooldown = false  # End stance change cooldown
 	is_attack_blocked = false  # Reset the attack blocked flag
 
-func change_stance(new_stance: String):
+func change_stance(new_stance: String) -> void:
 	is_attack_blocked = false
 	if character.current_stance == new_stance and character.current_stance != "Mid":
 		return  # Prevent stance change if it's the same as the current stance (except for Mid)
@@ -169,19 +169,19 @@ func change_stance(new_stance: String):
 	await get_tree().create_timer(character.stanceChangeCooldown).timeout
 	stance_change_cooldown = false  # End stance change cooldown
 
-func set_current_stance(new_stance: String):
+func set_current_stance(new_stance: String) -> void:
 	character.current_stance = new_stance
 
-func unseathe_sword():
+func unseathe_sword() -> void:
 	if sword_sheathed:
 		sword_sheathed = false
 
-func _on_sword_hit_area_area_entered(area):
-	var entity = area.owner
+func _on_sword_hit_area_area_entered(area : Area2D) -> void:
+	var entity : Object = area.owner
 	if area.is_in_group("hurtbox") and entity != character:
 		if entity is Character and is_instance_valid(entity) and is_instance_valid(entity.combat_module):
-			var attacker_stance = current_attack_stance
-			var defender_stance = entity.current_stance  # Assuming the defender also has current_stance variable
+			var attacker_stance : String = current_attack_stance
+			var defender_stance : String = entity.current_stance  # Assuming the defender also has current_stance variable
 			if character.is_facing_each_other(entity):
 				if is_blocked(attacker_stance, defender_stance) and not movement_module.is_running:
 					character.print_debug(attacker_stance + " attack blocked by " + entity.player_name)
@@ -201,10 +201,10 @@ func _on_sword_hit_area_area_entered(area):
 func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
 	return attacker_stance == defender_stance and not movement_module.is_running
 
-func attack_damage_calculator():
-	return randi_range(character.damageRange[0], character.damageRange[1])
+func attack_damage_calculator() -> float:
+	return randi_range(character.damageRange[0], character.damageRange[1]) as float
 
-func take_damage(amount: int, attack_stance: String):
+func take_damage(amount: int, attack_stance: String) -> void:
 	if is_taking_damage:
 		return # Prevent taking damage if already in the process of taking damage
 
@@ -226,7 +226,7 @@ func take_damage(amount: int, attack_stance: String):
 		character.modulate = Color(1, 1, 1)  # Reset color back to normal
 		is_taking_damage = false
 
-func _interrupt_attack():
+func _interrupt_attack() -> void:
 	character.animPlayer_torso.stop()  # Stop the attack animation
 
 	

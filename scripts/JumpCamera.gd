@@ -1,24 +1,24 @@
 extends Camera2D
 
 # Variables for smoothing
-var target_offset_y = -75.0
-var offset_smoothing_speed = 3.50  # Adjust this value to control the smoothing speed
-var is_jumping_state = false  # Variable to track the jumping state
-var initial_offset_y = -270.0  # Set this to the desired initial offset
+var target_offset_y : float = -75.0
+var offset_smoothing_speed : float  = 3.50  # Adjust this value to control the smoothing speed
+var is_jumping_state : bool = false  # Variable to track the jumping state
+var initial_offset_y : float = -270.0  # Set this to the desired initial offset
 
 # This function is called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	initial_offset_y = offset.y
 	#print("Camera", name, "initialized with target_offset_y:", target_offset_y)
 
-func _process(delta):
+func _process(delta : float) -> void:
 	# Smoothly interpolate towards the target offset
 	if not is_jumping_state:  # Only update the offset if not jumping
 		offset.y = lerp(offset.y, target_offset_y, offset_smoothing_speed * delta)
 		#print("Camera", name, "lerp to target_offset_y:", target_offset_y, "current offset.y:", offset.y)
 
 # This function is called when the grounded_updated signal is emitted.
-func _on_grounded_updated(jumping_state):
+func _on_grounded_updated(jumping_state : bool) -> void:
 	is_jumping_state = jumping_state  # Update the jumping state
 	if not jumping_state:
 		pass
@@ -28,10 +28,10 @@ func _on_grounded_updated(jumping_state):
 	#print("Camera", name, "drag_vertical_enabled:", drag_vertical_enabled)
 
 # For debugging
-func print_debug(message: String):
+func print_debug(message : String) -> void:
 	print(message)
 	
-func _update_camera_offset(distance_to_floorline):
+func _update_camera_offset(distance_to_floorline : float) -> void:
 	## Initial and final offset values
 	#var final_offset_y = 100.0
 	#var max_distance = 600.0
@@ -56,11 +56,11 @@ func _update_camera_offset(distance_to_floorline):
 	pass
 
 # Linear interpolation function
-func lerp(a, b, t):
+func lerp(a : float, b: float, t:float)  -> float:
 	return a + (b - a) * t
 
 # This function handles the distance to floorline updates
-func _on_distance_to_floor(_distance_to_floorline):
+func _on_distance_to_floor(_distance_to_floorline : float)  -> void:
 	#disabled until I can figure out how to make it smooth and work fine with the two player camera
 	#_update_camera_offset(distance_to_floorline)
 	pass

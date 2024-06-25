@@ -4,59 +4,59 @@ extends CharacterBody2D
 class_name Character
 
 # Player properties
-@export var life: int = 100
-@export var stamina: int = 100
-var stance = ["Top", "Mid", "Low"]
-var current_stance = "Mid"
-@export var player_name: String = "player1"
-@export var weapon: String = "katana"
-@export var speed: float = 400.0  # Adjusted speed
-@export var player_height: float = 175.0  # Player height in centimeters (1.75 meters)
-@export var stance_penalty_duration: float = 0.5  # Penalty duration in seconds
-@export var stanceChangeCooldown: float = 0.2  # Cooldown for changing stances
-@export var damageRange = [90,200]
+@export var life : int = 100
+@export var stamina : int = 100
+var stance : Array[String]= ["Top", "Mid", "Low"]
+var current_stance : String = "Mid"
+@export var player_name : String = "player1"
+@export var weapon : String = "katana"
+@export var speed : float = 400.0  # Adjusted speed
+@export var player_height : float = 175.0  # Player height in centimeters (1.75 meters)
+@export var stance_penalty_duration : float = 0.5  # Penalty duration in seconds
+@export var stanceChangeCooldown : float = 0.2  # Cooldown for changing stances
+@export var damageRange : Array[float] = [90,200]
 
 #Multiplayer coop control variables
-@export var controls: Resource = null
+@export var controls : Resource = null
 
 
 # Reference to the AnimationPlayer nodes
-@onready var animPlayer_legs = $LegsAnimationPlayer
-@onready var animPlayer_torso = $TorsoAnimationPlayer
-@onready var animPlayer_full_body = $FullBodyAnimationPlayer
+@onready var animPlayer_legs : AnimationPlayer = $LegsAnimationPlayer
+@onready var animPlayer_torso : AnimationPlayer = $TorsoAnimationPlayer
+@onready var animPlayer_full_body : AnimationPlayer = $FullBodyAnimationPlayer
 
 # Reference to the AnimatedSprite2D nodes
-@onready var legs_sprite = $AnimatedSprite2DLegs
-@onready var torso_sprite = $AnimatedSprite2DTorso
-@onready var full_body_sprite = $AnimatedSprite2DFullBody
+@onready var legs_sprite : AnimatedSprite2D = $AnimatedSprite2DLegs
+@onready var torso_sprite : AnimatedSprite2D = $AnimatedSprite2DTorso
+@onready var full_body_sprite : AnimatedSprite2D = $AnimatedSprite2DFullBody
 
 #References to raycasts
-@onready var front_ray = $AnimatedSprite2DTorso/FrontRaycast
-@onready var back_ray = $AnimatedSprite2DTorso/BackRaycast
+@onready var front_ray  : RayCast2D = $AnimatedSprite2DTorso/FrontRaycast
+@onready var back_ray  : RayCast2D = $AnimatedSprite2DTorso/BackRaycast
 
 #Raycast flags
-var is_facing_right = true
+var is_facing_right : bool = true
 
 # Current animation state
-var current_torso_animation = ""
+var current_torso_animation : String = ""
 
 #Blood emitter
-@onready var blood_emitter = $BloodEmitterContainer/BloodParticleEmitter
-@onready var emitter_original_position = $BloodEmitterContainer.position.y
-@onready var slashblood_emitter = $BloodSlashEmitterContainer/BloodSlashParticleEmitter
+@onready var blood_emitter : GPUParticles2D = $BloodEmitterContainer/BloodParticleEmitter
+@onready var emitter_original_position : float = $BloodEmitterContainer.position.y
+@onready var slashblood_emitter : GPUParticles2D = $BloodSlashEmitterContainer/BloodSlashParticleEmitter
 var tween: Tween
 
 #Modules
-@onready var stamina_module = $StaminaModule
-@onready var movement_module = $MovementModule
-@onready var combat_module = $CombatModule
+@onready var stamina_module : Node = $StaminaModule
+@onready var movement_module : Node = $MovementModule
+@onready var combat_module : Node = $CombatModule
 
 #for camera help
-signal grounded_updated (is_jumping)
+signal grounded_updated ( is_jumping: bool)
 #this passes the transform to the parent so the camera can be there.
 #signal transform_changed(new_transform)
 
-func _ready():
+func _ready() -> void :
 	set_process(true)
 	animPlayer_legs.play("idle_legs")
 	full_body_sprite.visible = false
@@ -68,10 +68,10 @@ func _ready():
 	movement_module.connect("grounded_updated", Callable(self, "_on_grounded_updated"))
 	stamina_module.connect("stamina_changed", Callable(self, "_on_stamina_changed"))
 	stamina_module.connect("stamina_exhausted", Callable(self, "_on_stamina_exhausted"))
-	stamina_module.connect("exhausted_changed", Callable(movement_module, "_on_exhausted_changed"))
+	#stamina_module.connect("exhausted_changed", Callable(movement_module, "_on_exhausted_changed"))
 
 
-func _physics_process(delta):
+func _physics_process(delta : float) -> void :
 	# Update movement module states
 	movement_module.apply_gravity(delta)
 	movement_module.move_and_slide()
@@ -90,20 +90,20 @@ func _physics_process(delta):
 	#Debug
 # Combat-related functions
 
-func update_facing_direction():
+func update_facing_direction() -> void :
 	if combat_module and is_instance_valid(combat_module):
 		# Remove enemies no longer in range
-		for enemy in combat_module.enemies_in_range:
+		for enemy : Node in combat_module.enemies_in_range:
 			if not is_instance_valid(enemy) or (global_position.distance_to(enemy.global_position) > 100):
 				combat_module.enemies_in_range.erase(enemy)
 
 		# Add new enemies in range
 		if front_ray.is_colliding() and front_ray.get_collider() is Character:
-			var enemy = front_ray.get_collider()
+			var enemy : Object = front_ray.get_collider()
 			if not combat_module.enemies_in_range.has(enemy):
 				combat_module.enemies_in_range.append(enemy)
 		if back_ray.is_colliding() and back_ray.get_collider() is Character:
-			var enemy = back_ray.get_collider()
+			var enemy : Object = back_ray.get_collider()
 			if not combat_module.enemies_in_range.has(enemy):
 				combat_module.enemies_in_range.append(enemy)
 
@@ -150,7 +150,7 @@ func update_facing_direction():
 				#full_body_sprite.position = Vector2(full_body_sprite_xPos, full_body_sprite.position.y)
 
 
-func engage_enemy(enemy):
+func engage_enemy(enemy : Object) -> void :
 	if life > 0:
 		movement_module.facing = movement_module.RIGHT if global_position.x < enemy.global_position.x else movement_module.LEFT
 		legs_sprite.scale.x = 1 if movement_module.facing == movement_module.RIGHT else -1
@@ -159,14 +159,14 @@ func engage_enemy(enemy):
 		#full_body_sprite.position = Vector2(-full_body_sprite_xPos, full_body_sprite.position.y) if full_body_sprite.scale.x > 0 else Vector2(full_body_sprite_xPos, full_body_sprite.position.y)
 	
 
-func switch_engagement(facing_direction):
+func switch_engagement(facing_direction : Vector2) -> void :
 	if combat_module and is_instance_valid(combat_module):
 		if combat_module.enemies_in_range.size() > 0:
-			for enemy in combat_module.enemies_in_range:
+			for enemy : Node in combat_module.enemies_in_range:
 				if (facing_direction == movement_module.RIGHT and global_position.x < enemy.global_position.x) or (facing_direction == movement_module.LEFT and global_position.x > enemy.global_position.x):
 					engage_enemy(enemy)
 					break
-func handle_target_switch():
+func handle_target_switch() -> void :
 	if combat_module and is_instance_valid(combat_module):
 		# Switch engagement based on joystick direction
 		if Input.is_action_pressed(controls.stance_midL) and movement_module.facing == movement_module.RIGHT:
@@ -175,12 +175,12 @@ func handle_target_switch():
 			combat_module.stance_button_held = true
 			switch_engagement(movement_module.LEFT)
 
-func is_facing_each_other(entity) -> bool:
-	var self_facing_direction = 1 if movement_module.facing == movement_module.RIGHT else -1
-	var entity_facing_direction = 1 if entity.movement_module.facing == movement_module.RIGHT else -1
+func is_facing_each_other(entity : Object) -> bool:
+	var self_facing_direction : float = 1 if movement_module.facing == movement_module.RIGHT else -1
+	var entity_facing_direction : float = 1 if entity.movement_module.facing == movement_module.RIGHT else -1
 	return (global_position - entity.global_position).x * self_facing_direction < 0 and self_facing_direction != entity_facing_direction
 
-func play_death_animation(current_attack_stance):
+func play_death_animation(current_attack_stance : String) -> void :
 	print("play_death_animation called with stance: ", current_attack_stance)
 	legs_sprite.visible = false
 	torso_sprite.visible = false
@@ -190,9 +190,9 @@ func play_death_animation(current_attack_stance):
 	fluctuate_particle_emission(current_attack_stance)
 	animPlayer_full_body.play("death1")
 	
-func blood_emitter_offset(current_attack_stance):
+func blood_emitter_offset(current_attack_stance : String) -> void :
 # Adjust position depending on where the cut is coming from
-	var cut_offset = 0.0
+	var cut_offset : float = 0.0
 	if current_attack_stance == "Top":
 		cut_offset = 0.0  # No change
 	elif current_attack_stance == "Mid":
@@ -202,26 +202,26 @@ func blood_emitter_offset(current_attack_stance):
 
 	$BloodEmitterContainer.position.y += cut_offset
 
-func fluctuate_particle_emission(current_attack_stance):
+func fluctuate_particle_emission(current_attack_stance : String) -> void :
 	$BloodEmitterContainer.position.y = emitter_original_position
 	blood_emitter_offset(current_attack_stance)
 	# Calculate base direction with fuzziness
-	var base_y = randf_range(-3, 3)
-	var base_x = randf_range(1, 3) if base_y < 0 else 3
+	var base_y : float = randf_range(-3, 3)
+	var base_x : float = randf_range(1, 3) if base_y < 0.0 else 3.0
 	
 	# Set the direction with calculated variance
 	blood_emitter.process_material.direction = Vector3(base_x, base_y, 0)
 	
-	var iterations = randi_range(1, 7)
-	var initial_max_velocity = blood_emitter.process_material.initial_velocity_min
-	var custom_max_velocity = 80
+	var iterations : float = randi_range(1, 7)
+	var initial_max_velocity : float = blood_emitter.process_material.initial_velocity_min
+	var custom_max_velocity : float = 80
 	if tween:
 		tween.kill()
 	tween = create_tween()
 	for i in range(iterations):
-		var decrease_time = randf_range(0.2, 0.7)
-		var increase_time = randf_range(0.3, 1.0)
-		var max_value = 1.0 / (i + 1)  # Calculate the max value for each iteration
+		var decrease_time : float = randf_range(0.2, 0.7)
+		var increase_time : float = randf_range(0.3, 1.0)
+		var max_value : float = 1.0 / (i + 1)  # Calculate the max value for each iteration
 		# Set initial velocity for each iteration
 		if i == 0:
 			blood_emitter.process_material.initial_velocity_min = initial_max_velocity
@@ -237,8 +237,11 @@ func fluctuate_particle_emission(current_attack_stance):
 		await tween.finished
 	blood_emitter.emitting = false
 	
-func blood_slash_splatter(current_attack_stance):
-	var slashtween = create_tween()
+func blood_slash_splatter(current_attack_stance : String) -> void :
+	var slashtween : Tween 
+	if slashtween:
+		slashtween.kill()
+	slashtween = create_tween()
 	if current_attack_stance == "Low":
 		slashblood_emitter.process_material.direction = Vector3(-20, -30, 0)
 	elif current_attack_stance == "Mid":
@@ -246,8 +249,8 @@ func blood_slash_splatter(current_attack_stance):
 	elif current_attack_stance == "Top":
 		slashblood_emitter.process_material.direction = Vector3(-5, 60, 0)
 	
-	var decrease_time = randf_range(0.1, 0.2)
-	var increase_time = 0
+	var decrease_time : float = randf_range(0.1, 0.2)
+	var increase_time : float = 0
 	if slashtween:
 		slashtween.kill()
 		slashtween = create_tween()
@@ -259,10 +262,10 @@ func blood_slash_splatter(current_attack_stance):
 		await slashtween.finished
 	slashblood_emitter.emitting = false
 	
-func update_torso_animation():
+func update_torso_animation() -> void :
 	if combat_module and is_instance_valid(combat_module):
 		if not combat_module.is_attacking:
-			var new_animation = ""
+			var new_animation : String = ""
 			if current_stance == "Mid":
 				if combat_module.is_midSwing_complete:
 					new_animation = "stanceMid2"
@@ -278,13 +281,13 @@ func update_torso_animation():
 				current_torso_animation = new_animation
 				animPlayer_torso.play(new_animation)
 
-func play_run_animation():
+func play_run_animation() -> void :
 	legs_sprite.visible = false
 	torso_sprite.visible = false
 	full_body_sprite.visible = true
 	animPlayer_full_body.play("running")
 
-func stop_run_animation():
+func stop_run_animation() -> void :
 	full_body_sprite.visible = false
 	legs_sprite.visible = true
 	torso_sprite.visible = true
@@ -292,11 +295,11 @@ func stop_run_animation():
 	update_leg_animation()
 
 
-func update_animation():
+func update_animation() -> void :
 	if combat_module and is_instance_valid(combat_module):
-		if movement_module.is_running:
+		if movement_module.is_running and not movement_module.is_jumping:
 			#animPlayer_torso.play("attack_" + current_stance)
-			animPlayer_legs.play("running")
+			play_run_animation()
 		elif movement_module.is_dashing:
 			animPlayer_legs.play("dash")
 		else:
@@ -304,8 +307,8 @@ func update_animation():
 		if not combat_module.is_attacking:
 			update_torso_animation()
 	
-func update_leg_animation():
-	var threshold = 0.01  # Define a small threshold for velocity
+func update_leg_animation() -> void :
+	var threshold : float = 0.01  # Define a small threshold for velocity
 
 	if movement_module.is_jumping:
 		if velocity.y > 0:
@@ -327,11 +330,11 @@ func update_leg_animation():
 
 
 
-func print_debug(message: String):
+func print_debug(message: String) -> void :
 	print(player_name + ": " + message)
 	
 # Additional function to debug the is_midSwing_complete state
-func _process(_delta):
+func _process(_delta : float) -> void :
 	#print("is_jumping:", is_jumping)
 	pass
 
@@ -339,7 +342,7 @@ func _process(_delta):
 	#movement_module.is_jumping = is_jumping
 
 
-func _on_torso_animation_player_animation_finished(_anim_name: StringName):
+func _on_torso_animation_player_animation_finished(_anim_name: StringName) -> void :
 	if combat_module and is_instance_valid(combat_module):
 		combat_module.is_attacking = false
 		if combat_module.is_attack_blocked:
@@ -353,16 +356,16 @@ func _on_torso_animation_player_animation_finished(_anim_name: StringName):
 		update_torso_animation()
 		current_torso_animation = ""
 
-func _on_legs_animation_player_animation_finished(_anim_name: StringName):
+func _on_legs_animation_player_animation_finished(_anim_name: StringName) -> void :
 	if animPlayer_legs.current_animation == "jump_down":
 		#is_jumping = false
 		update_leg_animation()
 		
-func _on_stamina_changed(current_stamina: int):
+func _on_stamina_changed(current_stamina: int) -> void :
 	# Handle stamina change (e.g., update UI)
 	pass
 
-func _on_stamina_exhausted():
+func _on_stamina_exhausted() -> void :
 	movement_module.stop_run()
 	# Handle stamina exhaustion (e.g., prevent attacking or dashing)
 

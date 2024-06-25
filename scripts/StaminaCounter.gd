@@ -3,16 +3,16 @@ extends Control
 @export var stamina_module_path: NodePath = NodePath("../../character/StaminaModule")
 @export var player_path: NodePath = NodePath("../../character")
 
-var stamina_spheres = []
-var stamina_module
-var player
-var tween
+var stamina_spheres : Array = []
+var stamina_module : Node
+var player : Node
+var tween : Tween
 
 # Signals
 signal stamina_changed(current_stamina: int)
 signal stamina_exhausted()
 
-func _ready():
+func _ready() -> void:
 	stamina_spheres = [
 		$Circle0/Node2D,
 		$Circle1/Node2D,
@@ -37,28 +37,28 @@ func _ready():
 
 	modulate.a = 0.0  # Start with the counter hidden
 
-func _on_stamina_changed(current_stamina: int):
+func _on_stamina_changed(current_stamina : int) -> void:
 	update_stamina_visual(current_stamina)
 	if current_stamina == stamina_module.max_stamina:
 		hide_counter()
 	else:
 		show_counter()
 
-func _on_exhausted_changed(is_exhausted: bool):
+func _on_exhausted_changed(is_exhausted : bool) -> void:
 	if is_exhausted:
 		modulate = Color(1, 0.5, 0, 1)  # Orange
 	else:
 		modulate = Color(1, 1, 1, 1)  # White
 
-func _on_stamina_exhausted():
+func _on_stamina_exhausted() -> void:
 	# Handle exhaustion visual feedback if needed
 	pass
 
-func update_stamina_visual(current_stamina: int):
-	var stamina_per_circle = stamina_module.get("max_stamina") / stamina_spheres.size()
+func update_stamina_visual(current_stamina : int) -> void:
+	var stamina_per_circle : float = stamina_module.get("max_stamina") / stamina_spheres.size()
 	for i in range(stamina_spheres.size()):
-		var sphere = stamina_spheres[i]
-		var fill_amount = (current_stamina - i * stamina_per_circle) / stamina_per_circle
+		var sphere : Object = stamina_spheres[i]
+		var fill_amount : float = (current_stamina - i * stamina_per_circle) / stamina_per_circle
 		fill_amount = clamp(fill_amount, 0.0, 1.0)
 		sphere.call("update_fill", fill_amount)
 		if fill_amount >= 1.0:
@@ -66,20 +66,20 @@ func update_stamina_visual(current_stamina: int):
 		else:
 			sphere.modulate.a = 0.6  # Low opacity
 
-func hide_counter():
+func hide_counter() -> void:
 	if tween:
 		tween.kill()
 	if is_inside_tree():
 		tween = create_tween()
 		tween.tween_property(self, "modulate:a", 0.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 
-func show_counter():
+func show_counter() -> void:
 	if tween:
 		tween.kill()
 	if is_inside_tree():
 		tween = create_tween()
 		tween.tween_property(self, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 
-func _on_player_eliminated():
+func _on_player_eliminated() -> void:
 	if self.modulate.a>0.0 :
 		hide_counter()

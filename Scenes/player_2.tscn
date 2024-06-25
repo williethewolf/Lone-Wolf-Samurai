@@ -12,6 +12,8 @@ script = ExtResource("1_6b0wb")
 character_path = NodePath("character")
 controls = ExtResource("2_10rmp")
 player_number = 2
+jump_height = null
+min_jump_height = null
 
 [node name="character" parent="." instance=ExtResource("2_gk4bp")]
 player_name = "player2"
