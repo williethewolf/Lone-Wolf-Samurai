@@ -33,7 +33,7 @@ func _ready() -> void:
 	add_to_group("players")
 
 func _process(_delta : float) -> void:
-	if character and is_instance_valid(character):
+	if character and is_instance_valid(character) and not character.is_ai_controlled:
 		handle_input()
 
 func handle_input() -> void:

@@ -53,7 +53,6 @@ var attack_start_time : float = 0.0
 #Set dependencies
 @onready var character: Character = $".."
 
-
 func _ready() -> void:
 	if not character:
 		print("Character node not found!")

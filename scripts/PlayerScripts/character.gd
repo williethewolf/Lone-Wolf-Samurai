@@ -19,6 +19,8 @@ var current_stance : String = "Mid"
 #Multiplayer coop control variables
 @export var controls : Resource = null
 
+# AI control
+@export var is_ai_controlled: bool = false
 
 # Reference to the AnimationPlayer nodes
 @onready var animPlayer_legs : AnimationPlayer = $LegsAnimationPlayer

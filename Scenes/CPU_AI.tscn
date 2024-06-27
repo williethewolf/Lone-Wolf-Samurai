@@ -1,0 +1,27 @@
+[gd_scene load_steps=7 format=3 uid="uid://ccscpbv5skyvh"]
+
+[ext_resource type="Script" path="res://scripts/PlayerScripts/player1.gd" id="1_c4bwe"]
+[ext_resource type="Resource" uid="uid://7qyvr7oqdl16" path="res://Scenes/player_2_controls.tres" id="2_2o7en"]
+[ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="3_0dwb4"]
+[ext_resource type="PackedScene" uid="uid://co8omo8pt3w8r" path="res://Scenes/StaminaCounter.tscn" id="4_cpml4"]
+[ext_resource type="Script" path="res://scripts/StaminaCounterUIRoot.gd" id="5_1v77w"]
+[ext_resource type="Script" path="res://scripts/AIController.gd" id="6_vrqvf"]
+
+[node name="Player2" type="Node2D" groups=["Players"]]
+z_index = 1
+script = ExtResource("1_c4bwe")
+character_path = NodePath("character")
+controls = ExtResource("2_2o7en")
+player_number = 2
+
+[node name="character" parent="." instance=ExtResource("3_0dwb4")]
+player_name = "player2"
+controls = ExtResource("2_2o7en")
+is_ai_controlled = true
+
+[node name="StaminaCounter" parent="." instance=ExtResource("4_cpml4")]
+script = ExtResource("5_1v77w")
+
+[node name="AIComponent" type="Node" parent="."]
+script = ExtResource("6_vrqvf")
+character_path = NodePath("../character")
