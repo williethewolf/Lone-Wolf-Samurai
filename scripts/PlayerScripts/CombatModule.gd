@@ -115,7 +115,8 @@ func change_stance(new_stance: String) -> void:
 		return  # Prevent stance change if it's the same as the current stance (except for Mid)
 	character.current_stance = new_stance
 	unseathe_sword()
-	is_midSwing_complete= false
+	if new_stance in ["Low", "Top"]:
+		is_midSwing_complete= false
 	emit_signal("stance_changed", new_stance)  # Emit signal for stance change
 	
 	# Reset stance button held states

@@ -2064,6 +2064,7 @@ animation = &"idle_legs"
 position = Vector2(2, -14)
 sprite_frames = SubResource("SpriteFrames_k50ex")
 animation = &"attack3"
+frame = 5
 
 [node name="SwordHitArea" type="Area2D" parent="AnimatedSprite2DTorso"]
 
