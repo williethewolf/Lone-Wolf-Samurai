@@ -102,3 +102,4 @@ func _physics_process(delta : float) -> void :
 			run_timer = 0.0
 		if get_parent().stamina_module.is_exhausted:
 			stop_run()
+	get_parent().stamina_module.set_is_jumping(is_jumping)

@@ -3,13 +3,14 @@ extends Node
 # Stamina properties
 @export var max_stamina : float = 120.0
 @export var stamina_regen_rate_moving : float = 10.0  # Stamina points regenerated per second while moving
-@export var stamina_regen_rate_still : float = 20.0  # Stamina points regenerated per second while still
+@export var stamina_regen_rate_still : float = 40.0  # Stamina points regenerated per second while still
 @export var exhaustion_threshold : float = 0.5  # Threshold for removing exhaustion state
 @export var stamina_regen_rate_exhausted_modifier : float = 0.75  # Modifier for regeneration rate when exhausted
 
 var current_stamina : float
 var is_exhausted : bool = false
 var is_moving : bool = false
+var is_jumping : bool = false
 var is_attacking : bool = false
 
 # Signals
@@ -33,7 +34,7 @@ func deplete_stamina(amount : int) -> void :
 
 func regenerate_stamina(delta : float) -> void :
 	if current_stamina < max_stamina and not is_attacking and not movement_module.is_running:
-		var regen_rate : float = stamina_regen_rate_still if not is_moving else stamina_regen_rate_moving
+		var regen_rate : float = stamina_regen_rate_still if (not is_moving or is_jumping) else stamina_regen_rate_moving
 		if is_exhausted:
 			regen_rate *= stamina_regen_rate_exhausted_modifier
 		
@@ -53,6 +54,10 @@ func reset_exhaustion() -> void :
 
 func set_moving(moving : bool) -> void :
 	is_moving = moving
+
+func set_is_jumping(jumping : bool) -> void :
+	is_jumping = jumping
+
 
 func set_attacking(attacking : bool) -> void :
 	is_attacking = attacking
