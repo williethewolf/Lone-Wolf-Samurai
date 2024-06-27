@@ -189,6 +189,7 @@ func play_death_animation(current_attack_stance : String) -> void :
 	
 	fluctuate_particle_emission(current_attack_stance)
 	animPlayer_full_body.play("death1")
+	#call_deferred("queue_free")
 	
 func blood_emitter_offset(current_attack_stance : String) -> void :
 # Adjust position depending on where the cut is coming from

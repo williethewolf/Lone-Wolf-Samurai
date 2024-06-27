@@ -2,10 +2,10 @@
 
 [ext_resource type="Texture2D" uid="uid://c7pd2sj7ykjd0" path="res://sprites/Building sprites/tilesettry1.png" id="1_a74yq"]
 [ext_resource type="PackedScene" uid="uid://c74jtlkki0up6" path="res://Scenes/player_1.tscn" id="1_nvc63"]
+[ext_resource type="PackedScene" uid="uid://bepmiy1cu1ar5" path="res://Scenes/player_2.tscn" id="2_citic"]
 [ext_resource type="Texture2D" uid="uid://bwonwaq3grd6w" path="res://sprites/Building sprites/japanBackgropund1.png" id="2_i10jy"]
 [ext_resource type="Texture2D" uid="uid://bt4dxfnrnhq07" path="res://sprites/Building sprites/minka1.png" id="3_ab5g3"]
 [ext_resource type="Texture2D" uid="uid://c6wc4821h0k8a" path="res://sprites/Building sprites/minka2.png" id="4_alwnp"]
-[ext_resource type="PackedScene" uid="uid://bepmiy1cu1ar5" path="res://Scenes/player_2.tscn" id="6_a0xtt"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pjx3a"]
 texture = ExtResource("1_a74yq")
@@ -632,15 +632,10 @@ sources/0 = SubResource("TileSetAtlasSource_pjx3a")
 
 [node name="Players" type="Node2D" parent="."]
 
-[node name="Player1" parent="Players" groups=["Players"] instance=ExtResource("1_nvc63")]
-player_number = null
-jump_height = null
-min_jump_height = null
+[node name="Player1" parent="Players" instance=ExtResource("1_nvc63")]
 
-[node name="Player2" parent="Players" groups=["Players"] instance=ExtResource("6_a0xtt")]
-position = Vector2(773, 0)
-jump_height = null
-min_jump_height = null
+[node name="Player2" parent="Players" instance=ExtResource("2_citic")]
+position = Vector2(879, 12)
 
 [node name="Map" type="Node2D" parent="."]
 

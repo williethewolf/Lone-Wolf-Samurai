@@ -202,7 +202,7 @@ func is_blocked(attacker_stance: String, defender_stance: String) -> bool:
 	return attacker_stance == defender_stance and not movement_module.is_running
 
 func attack_damage_calculator() -> float:
-	return randi_range(character.damageRange[0], character.damageRange[1]) as float
+	return randi_range(character.damageRange[0], character.damageRange[1])
 
 func take_damage(amount: int, attack_stance: String) -> void:
 	if is_taking_damage:

@@ -2041,7 +2041,7 @@ scale_max = 6.0
 scale_curve = SubResource("CurveTexture_kahyn")
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_24d6n"]
-polygon = PackedVector2Array(-314, 159, 456, 159, 456, 182, -314, 180)
+polygon = PackedVector2Array(-97, 160, 229, 159, 229, 182, -99, 180)
 
 [node name="character" type="CharacterBody2D"]
 light_mask = 2

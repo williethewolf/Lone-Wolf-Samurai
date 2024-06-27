@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://co8omo8pt3w8r" path="res://Scenes/StaminaCounter.tscn" id="4_1hmrc"]
 [ext_resource type="Script" path="res://scripts/StaminaCounterUIRoot.gd" id="5_exucb"]
 
-[node name="Player2" type="Node2D"]
+[node name="Player2" type="Node2D" groups=["Players"]]
 z_index = 1
 script = ExtResource("1_6b0wb")
 character_path = NodePath("character")
