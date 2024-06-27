@@ -1,15 +1,22 @@
 extends Node
 
-# Dependencies
-var character: Character
-
 # Unseath variables
 var sword_sheathed : bool = true
 
 # Attack in progress flag
 var is_attacking : bool = false
 var next_stance : String = ""
-var stance_button_held : bool = false
+#var stance_button_held : bool = false
+var TopStance_button_held : bool = false
+var MidStance_button_held : bool = false
+var LowStance_button_held : bool = false
+
+var previous_top_stance_input : bool = false
+var previous_mid_stance_input : bool = false
+var previous_low_stance_input : bool = false
+
+var stance_set_by_attack: bool = false
+
 var is_midSwing_complete : bool = false
 
 # Attack variables for signals to AI and impact logic
@@ -36,41 +43,101 @@ var attack_animation_lengths : Dictionary = {
 	"Mid": 0.18,  # Mid attack animation length
 	"Low": 0.18,  # Low attack animation length
 }
-
+	
 # Time tracking
 var attack_start_time : float = 0.0
 
 @onready var stamina_module : Node = $"../StaminaModule"
 @onready var movement_module : Node = $"../MovementModule"
 
+#Set dependencies
+@onready var character: Character = $".."
+
+
 func _ready() -> void:
-	character = $".."
+	if not character:
+		print("Character node not found!")
+
 # Handle stance change
 func handle_stance_change() -> void:
 	if stance_change_cooldown:
 		return  # Prevent stance change during cooldown
 
-	stance_button_held = false
+	# Update button held states
+	var current_top_stance_input: bool = Input.is_action_pressed(character.controls.stance_top)
+	var current_mid_stance_input: bool = Input.is_action_pressed(character.controls.stance_mid) and character.movement_module.facing == character.movement_module.RIGHT
+	var current_low_stance_input: bool = Input.is_action_pressed(character.controls.stance_low)
+	
+	# Additional condition for Mid stance when facing LEFT
+	if not current_mid_stance_input:
+		current_mid_stance_input = Input.is_action_pressed(character.controls.stance_midL) and character.movement_module.facing == character.movement_module.LEFT
 
-	if Input.is_action_pressed(character.controls.stance_top):
-		stance_button_held = true
-		if character.current_stance != "Top":
-			change_stance("Top")
-	elif Input.is_action_pressed(character.controls.stance_low):
-		stance_button_held = true
-		if character.current_stance != "Low":
-			change_stance("Low")
-	elif Input.is_action_pressed(character.controls.stance_mid) and character.movement_module.facing == character.movement_module.RIGHT:
-		stance_button_held = true
-		if character.current_stance != "Mid":
-			change_stance("Mid")
-	elif Input.is_action_pressed(character.controls.stance_midL) and character.movement_module.facing == character.movement_module.LEFT:
-		stance_button_held = true
-		if character.current_stance != "Mid":
-			change_stance("Mid")
+	# Reset mid stance if transitioning through top or low stance
+	if stance_set_by_attack:
+		stance_change_cooldown = true  # Start stance change cooldown
+		await get_tree().create_timer(character.stance_penalty_duration).timeout
+		stance_change_cooldown = false 
+		if current_top_stance_input and not TopStance_button_held:
+			MidStance_button_held = false
+			if character.current_stance != "Top":
+				change_stance("Top")
+		elif current_low_stance_input and not LowStance_button_held:
+			MidStance_button_held = false
+			if character.current_stance != "Low":
+				change_stance("Low")
+		elif current_mid_stance_input and not MidStance_button_held:
+			if character.current_stance != "Mid":
+				change_stance("Mid")
+	else:
+		if current_top_stance_input or TopStance_button_held:
+			MidStance_button_held = false
+			if character.current_stance != "Top":
+				change_stance("Top")
+		elif current_low_stance_input or LowStance_button_held:
+			MidStance_button_held = false
+			if character.current_stance != "Low":
+				change_stance("Low")
+		elif current_mid_stance_input or MidStance_button_held:
+			if character.current_stance != "Mid":
+				change_stance("Mid")
 
 	if not is_attacking:
 		character.update_torso_animation()
+
+	# Update the previous input states
+	TopStance_button_held = current_top_stance_input
+	MidStance_button_held = current_mid_stance_input
+	LowStance_button_held = current_low_stance_input
+
+func change_stance(new_stance: String) -> void:
+	is_attack_blocked = false
+	if character.current_stance == new_stance and character.current_stance != "Mid":
+		return  # Prevent stance change if it's the same as the current stance (except for Mid)
+	character.current_stance = new_stance
+	unseathe_sword()
+	is_midSwing_complete= false
+	emit_signal("stance_changed", new_stance)  # Emit signal for stance change
+	
+	# Reset stance button held states
+	reset_stance_button_states()
+	
+	if is_attacking:
+		character.animPlayer_torso.stop()
+		is_attacking = false
+	stance_change_cooldown = true  # Start stance change cooldown
+	await get_tree().create_timer(character.stanceChangeCooldown).timeout
+	stance_change_cooldown = false  # End stance change cooldown
+
+func set_current_stance(new_stance: String) -> void:
+	character.current_stance = new_stance
+
+func stance_button_held() -> bool:
+	return TopStance_button_held or MidStance_button_held or LowStance_button_held
+
+func reset_stance_button_states() -> void:
+	TopStance_button_held = false
+	MidStance_button_held = false
+	LowStance_button_held = false
 
 # Handle attacks
 func handle_attacks() -> void:
@@ -85,18 +152,17 @@ func handle_attacks() -> void:
 		perform_attack("Low")
 
 # Perform attack
-func perform_attack(attack_stance : String) -> void:
+func perform_attack(attack_stance: String) -> void:
 	if is_attacking or stamina_module.is_exhausted:
 		return  # Prevent starting a new attack if already attacking
-	stamina_module.deplete_stamina(20) #MAKE THIS A PUBLIC VARIABLE
 	is_attacking = true  # Set attacking flag to true
-	is_attack_blocked = false # Reset the attack blocked flag
+	is_attack_blocked = false  # Reset the attack blocked flag
 	emit_signal("attack_stance_changed", attack_stance)  # Emit signal for attack stance change
 	attack_start_time = Time.get_ticks_msec() / 1000.0
 	unseathe_sword()
-	var penalty_duration : float = character.stance_penalty_duration
+	var penalty_duration: float = character.stance_penalty_duration
 
-	current_attack_stance = attack_stance # Set the global attack stance
+	current_attack_stance = attack_stance  # Set the global attack stance
 
 	if character.current_stance == "Mid" and attack_stance == "Mid":
 		penalty_duration *= 0.005  # Apply a small penalty duration for consecutive mid stance attacks to prevent spamming the animation.
@@ -106,16 +172,16 @@ func perform_attack(attack_stance : String) -> void:
 			character.animPlayer_torso.play("stanceMid")
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
-		stance_change_cooldown = false 
-	elif character.current_stance != attack_stance or stance_button_held:
+		stance_change_cooldown = false
+	elif character.current_stance != attack_stance:
 		if attack_stance == "Mid":
 			penalty_duration *= 0.5  # Reduce penalty by 50% for mid stance
-		next_stance = attack_stance
 		character.animPlayer_torso.play("stance" + attack_stance)
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
 		stance_change_cooldown = false  # End stance change cooldown
-
+	#Apply stamina change after animation
+	stamina_module.deplete_stamina(20)  # MAKE THIS A PUBLIC VARIABLE
 	# Start attack cooldown
 	attack_cooldown = true
 	if attack_stance == "Top":
@@ -134,7 +200,7 @@ func perform_attack(attack_stance : String) -> void:
 		character.animPlayer_torso.play("attack3")
 
 	# Wait for the duration of the animation before allowing another attack
-	var attack_duration : float = attack_animation_lengths[attack_stance]
+	var attack_duration: float = attack_animation_lengths[attack_stance]
 	await get_tree().create_timer(attack_duration).timeout
 
 	if is_attack_blocked:
@@ -146,31 +212,19 @@ func perform_attack(attack_stance : String) -> void:
 
 	attack_cooldown = false  # End attack cooldown
 	is_attacking = false  # Ensure is_attacking flag is reset after the cooldown
+
+	# Reset stance to attack stance after the attack
+	
+	change_stance(next_stance)
+	stance_set_by_attack = true 
 	character.update_torso_animation()
+	stance_set_by_attack = false  # Reset the flag after the attack cooldown
 
 func _apply_block_penalty() -> void:
 	stance_change_cooldown = true  # Start stance change cooldown
 	await get_tree().create_timer(character.stance_penalty_duration).timeout
 	stance_change_cooldown = false  # End stance change cooldown
 	is_attack_blocked = false  # Reset the attack blocked flag
-
-func change_stance(new_stance: String) -> void:
-	is_attack_blocked = false
-	if character.current_stance == new_stance and character.current_stance != "Mid":
-		return  # Prevent stance change if it's the same as the current stance (except for Mid)
-	character.current_stance = new_stance
-	unseathe_sword()
-	is_midSwing_complete= false
-	emit_signal("stance_changed", new_stance)  # Emit signal for stance change
-	if is_attacking:
-		character.animPlayer_torso.stop()
-		is_attacking = false
-	stance_change_cooldown = true  # Start stance change cooldown
-	await get_tree().create_timer(character.stanceChangeCooldown).timeout
-	stance_change_cooldown = false  # End stance change cooldown
-
-func set_current_stance(new_stance: String) -> void:
-	character.current_stance = new_stance
 
 func unseathe_sword() -> void:
 	if sword_sheathed:

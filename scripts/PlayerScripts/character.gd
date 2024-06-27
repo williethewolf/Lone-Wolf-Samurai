@@ -172,7 +172,7 @@ func handle_target_switch() -> void :
 		if Input.is_action_pressed(controls.stance_midL) and movement_module.facing == movement_module.RIGHT:
 			switch_engagement(movement_module.RIGHT)
 		elif Input.is_action_pressed(controls.stance_mid) and movement_module.facing == movement_module.LEFT:
-			combat_module.stance_button_held = true
+			combat_module.MidStance_button_held = true 
 			switch_engagement(movement_module.LEFT)
 
 func is_facing_each_other(entity : Object) -> bool:

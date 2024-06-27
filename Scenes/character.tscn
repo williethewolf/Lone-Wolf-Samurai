@@ -1024,7 +1024,7 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.181818),
+"times": PackedFloat32Array(0, 0.159894),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -1100,7 +1100,7 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.165367),
+"times": PackedFloat32Array(0, 0.155248),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -1176,7 +1176,7 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.160805),
+"times": PackedFloat32Array(0, 0.155324),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -1252,7 +1252,7 @@ tracks/5/path = NodePath("AnimatedSprite2DTorso/SwordHitArea/AttackCollisionShap
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.179487),
+"times": PackedFloat32Array(0, 0.155034),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -2058,14 +2058,12 @@ shape = SubResource("CapsuleShape2D_58rqj")
 
 [node name="AnimatedSprite2DLegs" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_c6t04")
-animation = &"jump_up"
-frame = 7
+animation = &"idle_legs"
 
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
 sprite_frames = SubResource("SpriteFrames_k50ex")
-animation = &"attack22"
-frame = 6
+animation = &"attack3"
 
 [node name="SwordHitArea" type="Area2D" parent="AnimatedSprite2DTorso"]
 
@@ -2082,7 +2080,7 @@ position = Vector2(-2, 14)
 shape = SubResource("CapsuleShape2D_0r20q")
 
 [node name="FrontRaycast" type="RayCast2D" parent="AnimatedSprite2DTorso"]
-position = Vector2(26, 0)
+position = Vector2(5, 0)
 target_position = Vector2(400, 0)
 collision_mask = 6
 
