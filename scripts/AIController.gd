@@ -10,6 +10,26 @@ extends Node
 # Main variables for AI decision making
 var target_character: Character = null
 
+# Reaction time ranges for different difficulty levels (in milliseconds)
+var reaction_time_ranges: Dictionary = {
+	"easy": Vector2(1.3, 1.5),
+	"medium": Vector2(0.3, 0.4),
+	"hard": Vector2(0.25, 0.35),
+	"extreme": Vector2(0.2, 0.25)
+}
+
+# Difficulty level of the AI
+@export var difficulty_level: String = "easy"
+
+# AI states
+enum AIState {
+	IDLE,
+	ATTACK,
+	BLOCK
+}
+
+var state: AIState = AIState.IDLE
+
 func _ready() -> void:
 	print("AIComponent _ready called")
 	if not character or not character.is_ai_controlled:
@@ -42,7 +62,7 @@ func _physics_process(delta: float) -> void:
 		
 		# Add AI movement or other logic here
 		if target_character:
-			#How to fight with player
+			#How to fight with player in range
 			execute_ai_combat_logic()
 		else:
 			#how to act when not in range
@@ -65,12 +85,35 @@ func ai_behavior() -> void:
 	pass
 
 func execute_ai_combat_logic() -> void:
-	# Example AI logic
-	if target_character:
-		if target_character.current_stance != combat_module.current_attack_stance:
-			# Perform attack or stance change
-			combat_module.perform_attack("Top")
-		else:
-			# Block or change stance to counter
-			combat_module.handle_stance_change()
+	match state:
+		AIState.IDLE:
+			# Determine action
+			if target_character.current_stance != combat_module.current_attack_stance and not combat_module.is_attacking:
+				state = AIState.ATTACK
+				execute_attack()
+			else:
+				state = AIState.BLOCK
+				execute_block()
 
+		AIState.ATTACK, AIState.BLOCK:
+			# Wait for the current action to finish
+			if not combat_module.is_attacking:
+				state = AIState.IDLE
+
+func execute_attack() -> void:
+	if state == AIState.ATTACK:
+		await get_tree().create_timer(AI_reaction_delay()).timeout
+		combat_module.perform_attack("Top")
+		state = AIState.IDLE
+
+func execute_block() -> void:
+	if state == AIState.BLOCK:
+		await get_tree().create_timer(AI_reaction_delay()).timeout
+		combat_module.handle_stance_change()
+		state = AIState.IDLE
+		
+
+# Simulate AI reaction delay based on difficulty level
+func AI_reaction_delay() -> float:
+	var range: Vector2 = reaction_time_ranges[difficulty_level]
+	return randf_range(range.x, range.y)

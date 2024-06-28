@@ -17,7 +17,6 @@ player_number = 2
 [node name="character" parent="." instance=ExtResource("2_gk4bp")]
 player_name = "player2"
 controls = ExtResource("2_10rmp")
-is_ai_controlled = true
 
 [node name="StaminaCounter" parent="." instance=ExtResource("4_1hmrc")]
 script = ExtResource("5_exucb")

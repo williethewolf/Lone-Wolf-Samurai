@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bb3wvexddf8t"]
+[gd_scene load_steps=10 format=3 uid="uid://bb3wvexddf8t"]
 
 [ext_resource type="Texture2D" uid="uid://c7pd2sj7ykjd0" path="res://sprites/Building sprites/tilesettry1.png" id="1_a74yq"]
 [ext_resource type="PackedScene" uid="uid://c74jtlkki0up6" path="res://Scenes/player_1.tscn" id="1_nvc63"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bwonwaq3grd6w" path="res://sprites/Building sprites/japanBackgropund1.png" id="2_i10jy"]
 [ext_resource type="Texture2D" uid="uid://bt4dxfnrnhq07" path="res://sprites/Building sprites/minka1.png" id="3_ab5g3"]
 [ext_resource type="Texture2D" uid="uid://c6wc4821h0k8a" path="res://sprites/Building sprites/minka2.png" id="4_alwnp"]
+[ext_resource type="PackedScene" uid="uid://ccscpbv5skyvh" path="res://Scenes/CPU_AI.tscn" id="7_t4yib"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pjx3a"]
 texture = ExtResource("1_a74yq")
@@ -682,3 +683,6 @@ texture = ExtResource("4_alwnp")
 [node name="Floorline" type="Node2D" parent="Map"]
 position = Vector2(0, 329)
 scale = Vector2(0.215, 0.215)
+
+[node name="CPUAI" parent="." instance=ExtResource("7_t4yib")]
+position = Vector2(455, 13)

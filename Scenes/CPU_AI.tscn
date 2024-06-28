@@ -5,23 +5,22 @@
 [ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="3_0dwb4"]
 [ext_resource type="PackedScene" uid="uid://co8omo8pt3w8r" path="res://Scenes/StaminaCounter.tscn" id="4_cpml4"]
 [ext_resource type="Script" path="res://scripts/StaminaCounterUIRoot.gd" id="5_1v77w"]
-[ext_resource type="Script" path="res://scripts/AIController.gd" id="6_vrqvf"]
+[ext_resource type="PackedScene" uid="uid://b7i8cesh0sx6b" path="res://Scenes/ai_component.tscn" id="6_vruma"]
 
-[node name="Player2" type="Node2D" groups=["Players"]]
+[node name="CPUAI" type="Node2D" groups=["Players"]]
+modulate = Color(1, 0.395368, 0.376652, 1)
 z_index = 1
 script = ExtResource("1_c4bwe")
 character_path = NodePath("character")
 controls = ExtResource("2_2o7en")
-player_number = 2
+player_number = 0
 
 [node name="character" parent="." instance=ExtResource("3_0dwb4")]
-player_name = "player2"
+player_name = "CPU"
 controls = ExtResource("2_2o7en")
 is_ai_controlled = true
 
 [node name="StaminaCounter" parent="." instance=ExtResource("4_cpml4")]
 script = ExtResource("5_1v77w")
 
-[node name="AIComponent" type="Node" parent="."]
-script = ExtResource("6_vrqvf")
-character_path = NodePath("../character")
+[node name="AIComponent" parent="." instance=ExtResource("6_vruma")]
