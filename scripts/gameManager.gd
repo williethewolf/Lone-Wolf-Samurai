@@ -99,7 +99,7 @@ func _physics_process(_delta: float) -> void:
 			update_line_thickness(distance)
 	
 	if players.has(1) and not players.has(2):
-		print("Single player camera")
+		#print("Single player camera")
 		# Use the multiplayer camera viewport
 		#players[1]["sub_viewport_container"].visible = false
 		switch_to_multiplayer_camera()
