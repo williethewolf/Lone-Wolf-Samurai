@@ -10,16 +10,22 @@ extends Node
 # Main variables for AI decision making
 var target_character: Character = null
 
-# Reaction time ranges for different difficulty levels (in milliseconds)
-var reaction_time_ranges: Dictionary = {
-	"easy": Vector2(1.3, 1.5),
-	"medium": Vector2(0.3, 0.4),
-	"hard": Vector2(0.25, 0.35),
-	"extreme": Vector2(0.2, 0.25)
-}
-
 # Difficulty level of the AI
-@export var difficulty_level: String = "easy"
+enum Difficulty {
+	EASY,
+	MEDIUM,
+	HARD,
+	EXTREME
+}
+@export var difficulty_level: Difficulty = Difficulty.MEDIUM
+
+# Reaction time ranges for different difficulty levels (in milliseconds)
+var reaction_times: Dictionary = {
+	Difficulty.EASY: Vector2(0.3, 0.5),
+	Difficulty.MEDIUM: Vector2(0.3, 0.4),
+	Difficulty.HARD: Vector2(0.25, 0.35),
+	Difficulty.EXTREME: Vector2(0.2, 0.25)
+}
 
 # AI states
 enum AIState {
@@ -115,5 +121,5 @@ func execute_block() -> void:
 
 # Simulate AI reaction delay based on difficulty level
 func AI_reaction_delay() -> float:
-	var range: Vector2 = reaction_time_ranges[difficulty_level]
-	return randf_range(range.x, range.y)
+	var reaction_range: Vector2 = reaction_times[difficulty_level]
+	return randf_range(reaction_range.x, reaction_range.y)
