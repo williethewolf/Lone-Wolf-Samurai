@@ -2,7 +2,7 @@ extends Node
 
 # Reference to the character the AI controls
 @export var character_path: NodePath
-@onready var character : Character = get_node(character_path) as Character
+@onready var character : Character = get_node_or_null("../character") as Character
 
 # Reference to the combat module
 @onready var combat_module : Node = character.combat_module
@@ -27,22 +27,33 @@ var reaction_times: Dictionary = {
 	Difficulty.EXTREME: Vector2(0.2, 0.25)
 }
 
+#This var sets how likely the AI is to act on a condition
+var confidence : float = 0.0
+
 # AI states
 enum AIState {
 	IDLE,
-	ATTACK,
-	BLOCK
+	MOVING,
+	ATTACKING,
+	BLOCKING,
+	ALERTED,
+	ENGAGED,
+	FLEEING,
 }
 
 var state: AIState = AIState.IDLE
 
 func _ready() -> void:
 	print("AIComponent _ready called")
-	if not character or not character.is_ai_controlled:
-		print("Character not found or not AI controlled")
+	if not character:
+		print("Character not found")
 		set_physics_process(false)
 		return
-	
+	if not character.is_ai_controlled:
+		print("Player Control AI Module Disabled")
+		#Here we will add logic to modify the sensors for the player characters.
+		set_physics_process(false)
+		return
 	print("Character found and AI controlled")
 	initialize_ai()
 	
@@ -95,27 +106,30 @@ func execute_ai_combat_logic() -> void:
 		AIState.IDLE:
 			# Determine action
 			if target_character.current_stance != combat_module.current_attack_stance and not combat_module.is_attacking:
-				state = AIState.ATTACK
-				execute_attack()
+				#state = AIState.ATTACKING
+				#execute_attack()
+				state = AIState.BLOCKING
+				execute_block(target_character.current_stance)
 			else:
-				state = AIState.BLOCK
-				execute_block()
+				state = AIState.BLOCKING
+				execute_block(target_character.current_stance)
 
-		AIState.ATTACK, AIState.BLOCK:
+		AIState.ATTACKING, AIState.BLOCKING:
 			# Wait for the current action to finish
 			if not combat_module.is_attacking:
 				state = AIState.IDLE
 
 func execute_attack() -> void:
-	if state == AIState.ATTACK:
+	if state == AIState.ATTACKING:
 		await get_tree().create_timer(AI_reaction_delay()).timeout
 		combat_module.perform_attack("Top")
 		state = AIState.IDLE
 
-func execute_block() -> void:
-	if state == AIState.BLOCK:
+func execute_block(target_stance: String) -> void:
+	if state == AIState.BLOCKING:
 		await get_tree().create_timer(AI_reaction_delay()).timeout
-		combat_module.handle_stance_change()
+		var action_name : String = "stance_" + target_stance.to_lower()
+		Input.action_press(character.controls.get(action_name))
 		state = AIState.IDLE
 		
 

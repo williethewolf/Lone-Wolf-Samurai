@@ -41,7 +41,7 @@ func _ready() -> void:
 
 func populate_players() -> void:
 	# Gather players into a dictionary
-	for player in get_tree().get_nodes_in_group("players"):
+	for player in get_tree().get_nodes_in_group("Players"):
 		var player_number: int = player.get("player_number")
 		print("Found player with number: " + str(player_number))
 

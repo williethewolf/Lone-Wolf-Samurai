@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scripts/StaminaCounterUIRoot.gd" id="5_1v77w"]
 [ext_resource type="PackedScene" uid="uid://b7i8cesh0sx6b" path="res://Scenes/ai_component.tscn" id="6_vruma"]
 
-[node name="CPUAI" type="Node2D" groups=["Players"]]
+[node name="CPUAI" type="Node2D" groups=["Enemies"]]
 modulate = Color(1, 0.395368, 0.376652, 1)
 z_index = 1
 script = ExtResource("1_c4bwe")

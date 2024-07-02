@@ -2097,6 +2097,9 @@ position = Vector2(-52, -55)
 scale = Vector2(0.35, 0.35)
 remote_path = NodePath("..")
 
+[node name="AISensorsAnchorRemoteTransform" type="RemoteTransform2D" parent="AnimatedSprite2DTorso/AnchorPoint"]
+remote_path = NodePath("..")
+
 [node name="TorsoAnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 "": SubResource("AnimationLibrary_24y8y")
