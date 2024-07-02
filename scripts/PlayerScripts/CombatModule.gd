@@ -165,6 +165,7 @@ func perform_attack(attack_stance: Stance) -> void:
 	elif character.current_stance != attack_stance:
 		if attack_stance == Stance.MID:
 			penalty_duration *= 0.5  # Reduce penalty by 50% for mid stance
+		character.current_stance = attack_stance
 		character.animPlayer_torso.play("stance" + stance_strings[attack_stance])
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(penalty_duration).timeout
