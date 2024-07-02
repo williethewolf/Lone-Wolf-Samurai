@@ -145,4 +145,6 @@ func execute_block(target_stance: Stance) -> void:
 # Simulate AI reaction delay based on difficulty level
 func AI_reaction_delay() -> float:
 	var reaction_range: Vector2 = reaction_times[difficulty_level]
-	return randf_range(reaction_range.x, reaction_range.y)
+	var weight: float = randf()
+	var skewed_weight: float = weight * weight
+	return reaction_range.x + skewed_weight * (reaction_range.y - reaction_range.x)
