@@ -21,10 +21,10 @@ enum Difficulty {
 
 # Reaction time ranges for different difficulty levels (in milliseconds)
 var reaction_times: Dictionary = {
-	Difficulty.EASY: Vector2(0.3, 0.5),
-	Difficulty.MEDIUM: Vector2(0.3, 0.4),
-	Difficulty.HARD: Vector2(0.25, 0.35),
-	Difficulty.EXTREME: Vector2(0.2, 0.25)
+	Difficulty.EASY: Vector2(0.2, 0.35),
+	Difficulty.MEDIUM: Vector2(0.2, 0.3),
+	Difficulty.HARD: Vector2(0.2, 0.25),
+	Difficulty.EXTREME: Vector2(0.15, 0.2)
 }
 
 #This var sets how likely the AI is to act on a condition
@@ -39,6 +39,15 @@ enum AIState {
 	ALERTED,
 	ENGAGED,
 	FLEEING,
+}
+
+# Enums for stances
+const Stance = preload("res://scripts/stanceEnum.gd").Stance
+var stance_strings :Dictionary = {
+	Stance.NONE: "none",
+	Stance.TOP: "Top",
+	Stance.MID: "Mid",
+	Stance.LOW: "Low"
 }
 
 var state: AIState = AIState.IDLE
@@ -125,11 +134,11 @@ func execute_attack() -> void:
 		combat_module.perform_attack("Top")
 		state = AIState.IDLE
 
-func execute_block(target_stance: String) -> void:
+func execute_block(target_stance: Stance) -> void:
 	if state == AIState.BLOCKING:
 		await get_tree().create_timer(AI_reaction_delay()).timeout
-		var action_name : String = "stance_" + target_stance.to_lower()
-		Input.action_press(character.controls.get(action_name))
+		var action_name : String = "stance_" + stance_strings[target_stance].to_lower()
+		combat_module.set_stance(target_stance)
 		state = AIState.IDLE
 		
 

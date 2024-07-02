@@ -6,8 +6,7 @@ class_name Character
 # Player properties
 @export var life : int = 100
 @export var stamina : int = 100
-var stance : Array[String]= ["Top", "Mid", "Low"]
-var current_stance : String = "Mid"
+@export var current_stance : Stance = Stance.MID
 @export var player_name : String = "player1"
 @export var weapon : String = "katana"
 @export var speed : float = 400.0  # Adjusted speed
@@ -15,6 +14,9 @@ var current_stance : String = "Mid"
 @export var stance_penalty_duration : float = 0.5  # Penalty duration in seconds
 @export var stanceChangeCooldown : float = 0.2  # Cooldown for changing stances
 @export var damageRange : Array[float] = [90,200]
+
+# Enums for stances
+const Stance = preload("res://scripts/stanceEnum.gd").Stance
 
 #Multiplayer coop control variables
 @export var controls : Resource = null
@@ -182,7 +184,7 @@ func is_facing_each_other(entity : Object) -> bool:
 	var entity_facing_direction : float = 1 if entity.movement_module.facing == movement_module.RIGHT else -1
 	return (global_position - entity.global_position).x * self_facing_direction < 0 and self_facing_direction != entity_facing_direction
 
-func play_death_animation(current_attack_stance : String) -> void :
+func play_death_animation(current_attack_stance : Stance) -> void :
 	print("play_death_animation called with stance: ", current_attack_stance)
 	legs_sprite.visible = false
 	torso_sprite.visible = false
@@ -193,19 +195,19 @@ func play_death_animation(current_attack_stance : String) -> void :
 	animPlayer_full_body.play("death1")
 	#call_deferred("queue_free")
 	
-func blood_emitter_offset(current_attack_stance : String) -> void :
+func blood_emitter_offset(current_attack_stance : Stance) -> void :
 # Adjust position depending on where the cut is coming from
 	var cut_offset : float = 0.0
-	if current_attack_stance == "Top":
+	if current_attack_stance ==Stance.TOP:
 		cut_offset = 0.0  # No change
-	elif current_attack_stance == "Mid":
+	elif current_attack_stance == Stance.MID:
 		cut_offset = 20.0  # Lower the emitter
-	elif current_attack_stance == "Low":
+	elif current_attack_stance == Stance.LOW:
 		cut_offset = 40.0  # Even lower
 
 	$BloodEmitterContainer.position.y += cut_offset
 
-func fluctuate_particle_emission(current_attack_stance : String) -> void :
+func fluctuate_particle_emission(current_attack_stance : Stance) -> void :
 	$BloodEmitterContainer.position.y = emitter_original_position
 	blood_emitter_offset(current_attack_stance)
 	# Calculate base direction with fuzziness
@@ -240,16 +242,16 @@ func fluctuate_particle_emission(current_attack_stance : String) -> void :
 		await tween.finished
 	blood_emitter.emitting = false
 	
-func blood_slash_splatter(current_attack_stance : String) -> void :
+func blood_slash_splatter(current_attack_stance : Stance) -> void :
 	var slashtween : Tween 
 	if slashtween:
 		slashtween.kill()
 	slashtween = create_tween()
-	if current_attack_stance == "Low":
+	if current_attack_stance == Stance.LOW:
 		slashblood_emitter.process_material.direction = Vector3(-20, -30, 0)
-	elif current_attack_stance == "Mid":
+	elif current_attack_stance == Stance.MID:
 		slashblood_emitter.process_material.direction = Vector3(0, 5, 0)
-	elif current_attack_stance == "Top":
+	elif current_attack_stance == Stance.TOP:
 		slashblood_emitter.process_material.direction = Vector3(-5, 60, 0)
 	
 	var decrease_time : float = randf_range(0.1, 0.2)
@@ -269,14 +271,14 @@ func update_torso_animation() -> void :
 	if combat_module and is_instance_valid(combat_module):
 		if not combat_module.is_attacking:
 			var new_animation : String = ""
-			if current_stance == "Mid":
+			if current_stance == Stance.MID:
 				if combat_module.is_midSwing_complete:
 					new_animation = "stanceMid2"
 				else:
 					new_animation = "stanceMid"
-			elif current_stance == "Top":
+			elif current_stance == Stance.TOP:
 				new_animation = "stanceTop"
-			elif current_stance == "Low":
+			elif current_stance == Stance.LOW:
 				new_animation = "stanceLow"
 
 			# Only update animation if it's different from the current one
@@ -353,9 +355,9 @@ func _on_torso_animation_player_animation_finished(_anim_name: StringName) -> vo
 			combat_module.is_attack_blocked = false  # Reset the flag
 		else:
 			# Change the stance only after the attack animation finishes if not blocked
-			if combat_module.next_stance != "":
+			if combat_module.next_stance != Stance.NONE:
 				current_stance = combat_module.next_stance
-				combat_module.next_stance = ""
+				combat_module.next_stance = Stance.NONE
 		update_torso_animation()
 		current_torso_animation = ""
 

@@ -5,6 +5,8 @@ var character: Character
 var movement_module: Node
 var combat_module: Node
 
+const Stance = preload("res://scripts/stanceEnum.gd").Stance
+
 # Multiplayer coop control variables
 @export var controls: Resource = null
 @export var player_number: int = 1
@@ -83,17 +85,17 @@ func handle_movement_input() -> void:
 func handle_combat_input() -> void:
 	if combat_module and is_instance_valid(combat_module):
 		if Input.is_action_pressed(controls.stance_top):
-			combat_module.set_stance("Top")
+			combat_module.set_stance(Stance.TOP)
 		elif Input.is_action_pressed(controls.stance_low):
-			combat_module.set_stance("Low")
+			combat_module.set_stance(Stance.LOW)
 		elif Input.is_action_pressed(controls.stance_mid) and character.movement_module.facing == character.movement_module.RIGHT:
-			combat_module.set_stance("Mid")
+			combat_module.set_stance(Stance.MID)
 		elif Input.is_action_pressed(controls.stance_midL) and character.movement_module.facing == character.movement_module.LEFT:
-			combat_module.set_stance("Mid")
+			combat_module.set_stance(Stance.MID)
 
 		if Input.is_action_just_pressed(controls.attack_top):
-			combat_module.perform_attack("Top")
+			combat_module.perform_attack(Stance.TOP)
 		elif Input.is_action_just_pressed(controls.attack_mid):
-			combat_module.perform_attack("Mid")
+			combat_module.perform_attack(Stance.MID)
 		elif Input.is_action_just_pressed(controls.attack_low):
-			combat_module.perform_attack("Low")
+			combat_module.perform_attack(Stance.LOW)
