@@ -5,14 +5,14 @@ var character: Character
 var movement_module: Node
 var combat_module: Node
 
-#Multiplayer coop control variables
+# Multiplayer coop control variables
 @export var controls: Resource = null
 @export var player_number: int = 1
 
-#Jumping vars
+# Jumping vars
 @export var jump_height: float = 200.0  # Jump height in pixels
 @export var min_jump_height: float = 20.0  # Minimum jump height in pixels
-var jump_pressed_duration : float= 0.0  # Duration for which the jump button is pressed
+var jump_pressed_duration : float = 0.0  # Duration for which the jump button is pressed
 var jump_duration: float = 0.05  # Duration to reach full jump height
 
 # Double-tap detection
@@ -29,7 +29,7 @@ func _ready() -> void:
 		combat_module = character.get_node_or_null("CombatModule")
 		set_process(true)
 		character.player_name = "Player" + str(player_number)
-	#makes sure it is part of the players group
+	# makes sure it is part of the players group
 	add_to_group("players")
 
 func _process(_delta : float) -> void:
@@ -37,6 +37,10 @@ func _process(_delta : float) -> void:
 		handle_input()
 
 func handle_input() -> void:
+	handle_movement_input()
+	handle_combat_input()
+
+func handle_movement_input() -> void:
 	if character and is_instance_valid(character):
 		movement_module.direction = Vector2.ZERO
 		if Input.is_action_pressed(controls.move_left):
@@ -56,11 +60,11 @@ func handle_input() -> void:
 				character.full_body_sprite.scale.x = 1
 				movement_module.run()
 			last_tap_time_right = Time.get_ticks_msec() / 1000.0
-		
+			
 		#COMMENTED UNTIL DASH IMPLEMENTED
 		#if Input.is_action_just_pressed(controls.dash):
 		#	movement_module.dash()
-
+		
 		if Input.is_action_just_released(controls.move_left) or Input.is_action_just_released(controls.move_right):
 			movement_module.stop_run()
 
@@ -75,9 +79,21 @@ func handle_input() -> void:
 			character.velocity.y = lerp(min_jump_height, jump_height, jump_ratio)
 
 		character.handle_target_switch()
-		
-	if combat_module and is_instance_valid(combat_module):
-		combat_module.handle_stance_change()
-		combat_module.handle_attacks()
 
-		
+func handle_combat_input() -> void:
+	if combat_module and is_instance_valid(combat_module):
+		if Input.is_action_pressed(controls.stance_top):
+			combat_module.set_stance("Top")
+		elif Input.is_action_pressed(controls.stance_low):
+			combat_module.set_stance("Low")
+		elif Input.is_action_pressed(controls.stance_mid) and character.movement_module.facing == character.movement_module.RIGHT:
+			combat_module.set_stance("Mid")
+		elif Input.is_action_pressed(controls.stance_midL) and character.movement_module.facing == character.movement_module.LEFT:
+			combat_module.set_stance("Mid")
+
+		if Input.is_action_just_pressed(controls.attack_top):
+			combat_module.perform_attack("Top")
+		elif Input.is_action_just_pressed(controls.attack_mid):
+			combat_module.perform_attack("Mid")
+		elif Input.is_action_just_pressed(controls.attack_low):
+			combat_module.perform_attack("Low")

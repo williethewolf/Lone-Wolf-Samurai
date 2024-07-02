@@ -43,14 +43,14 @@ var attack_animation_lengths : Dictionary = {
 	"Mid": 0.18,  # Mid attack animation length
 	"Low": 0.18,  # Low attack animation length
 }
-	
+
 # Time tracking
 var attack_start_time : float = 0.0
 
 @onready var stamina_module : Node = $"../StaminaModule"
 @onready var movement_module : Node = $"../MovementModule"
 
-#Set dependencies
+# Set dependencies
 @onready var character: Character = $".."
 
 func _ready() -> void:
@@ -58,45 +58,36 @@ func _ready() -> void:
 		print("Character node not found!")
 
 # Handle stance change
-func handle_stance_change() -> void:
+func set_stance(new_stance: String) -> void:
 	if stance_change_cooldown:
 		return  # Prevent stance change during cooldown
-
-	# Update button held states
-	var current_top_stance_input: bool = Input.is_action_pressed(character.controls.stance_top)
-	var current_mid_stance_input: bool = Input.is_action_pressed(character.controls.stance_mid) and character.movement_module.facing == character.movement_module.RIGHT
-	var current_low_stance_input: bool = Input.is_action_pressed(character.controls.stance_low)
-	
-	# Additional condition for Mid stance when facing LEFT
-	if not current_mid_stance_input:
-		current_mid_stance_input = Input.is_action_pressed(character.controls.stance_midL) and character.movement_module.facing == character.movement_module.LEFT
 
 	# Reset mid stance if transitioning through top or low stance
 	if stance_set_by_attack:
 		stance_change_cooldown = true  # Start stance change cooldown
 		await get_tree().create_timer(character.stance_penalty_duration).timeout
 		stance_change_cooldown = false 
-		if current_top_stance_input and not TopStance_button_held:
+		if new_stance == "Top" and not TopStance_button_held:
 			MidStance_button_held = false
 			if character.current_stance != "Top":
 				change_stance("Top")
-		elif current_low_stance_input and not LowStance_button_held:
+		elif new_stance == "Low" and not LowStance_button_held:
 			MidStance_button_held = false
 			if character.current_stance != "Low":
 				change_stance("Low")
-		elif current_mid_stance_input and not MidStance_button_held:
+		elif new_stance == "Mid" and not MidStance_button_held:
 			if character.current_stance != "Mid":
 				change_stance("Mid")
 	else:
-		if current_top_stance_input or TopStance_button_held:
+		if new_stance == "Top" or TopStance_button_held:
 			MidStance_button_held = false
 			if character.current_stance != "Top":
 				change_stance("Top")
-		elif current_low_stance_input or LowStance_button_held:
+		elif new_stance == "Low" or LowStance_button_held:
 			MidStance_button_held = false
 			if character.current_stance != "Low":
 				change_stance("Low")
-		elif current_mid_stance_input or MidStance_button_held:
+		elif new_stance == "Mid" or MidStance_button_held:
 			if character.current_stance != "Mid":
 				change_stance("Mid")
 
@@ -104,9 +95,9 @@ func handle_stance_change() -> void:
 		character.update_torso_animation()
 
 	# Update the previous input states
-	TopStance_button_held = current_top_stance_input
-	MidStance_button_held = current_mid_stance_input
-	LowStance_button_held = current_low_stance_input
+	TopStance_button_held = new_stance == "Top"
+	MidStance_button_held = new_stance == "Mid"
+	LowStance_button_held = new_stance == "Low"
 
 func change_stance(new_stance: String) -> void:
 	is_attack_blocked = false
@@ -125,6 +116,7 @@ func change_stance(new_stance: String) -> void:
 		character.animPlayer_torso.stop()
 		is_attacking = false
 	stance_change_cooldown = true  # Start stance change cooldown
+	
 	await get_tree().create_timer(character.stanceChangeCooldown).timeout
 	stance_change_cooldown = false  # End stance change cooldown
 
@@ -140,18 +132,6 @@ func reset_stance_button_states() -> void:
 	LowStance_button_held = false
 
 # Handle attacks
-func handle_attacks() -> void:
-	if attack_cooldown:
-		return  # Prevent attacks during cooldown
-
-	if Input.is_action_just_pressed(character.controls.attack_top):
-		perform_attack("Top")
-	elif Input.is_action_just_pressed(character.controls.attack_mid):
-		perform_attack("Mid")
-	elif Input.is_action_just_pressed(character.controls.attack_low):
-		perform_attack("Low")
-
-# Perform attack
 func perform_attack(attack_stance: String) -> void:
 	if is_attacking or stamina_module.is_exhausted:
 		return  # Prevent starting a new attack if already attacking
@@ -262,7 +242,6 @@ func take_damage(amount: int, attack_stance: String) -> void:
 	if is_taking_damage:
 		return # Prevent taking damage if already in the process of taking damage
 
-	
 	character.life -= amount
 	
 	if character.life <= 0:
@@ -282,6 +261,3 @@ func take_damage(amount: int, attack_stance: String) -> void:
 
 func _interrupt_attack() -> void:
 	character.animPlayer_torso.stop()  # Stop the attack animation
-
-	
-
