@@ -1,22 +1,42 @@
-[gd_scene load_steps=4 format=3 uid="uid://b7i8cesh0sx6b"]
+[gd_scene load_steps=5 format=3 uid="uid://b7i8cesh0sx6b"]
 
 [ext_resource type="Script" path="res://scripts/AIController.gd" id="1_jic41"]
 [ext_resource type="Script" path="res://scripts/AISensorsUIRoot.gd" id="2_bt5t5"]
+[ext_resource type="Texture2D" uid="uid://bw1l0gu4njamg" path="res://sprites/UI_sprites/exclamation.png" id="3_gogp2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_oaoow"]
+radius = 8.0
 
 [node name="AIComponent" type="Node"]
 script = ExtResource("1_jic41")
 
-[node name="AISensors" type="Area2D" parent="."]
+[node name="AISensors" type="Node2D" parent="."]
 script = ExtResource("2_bt5t5")
 
-[node name="DetectionCone" type="CollisionPolygon2D" parent="AISensors"]
+[node name="DetectionConeArea2D" type="Area2D" parent="AISensors"]
+collision_layer = 32
+collision_mask = 2
+
+[node name="DetectionCone" type="CollisionPolygon2D" parent="AISensors/DetectionConeArea2D"]
 polygon = PackedVector2Array(-200, 0, 65, -230, 365, -344, 755, -463, 982, 2, 755, 325, 365, 275, 55, 177)
 
-[node name="LongDetectionCone" type="CollisionPolygon2D" parent="AISensors"]
+[node name="LongDetectionConeArea2D" type="Area2D" parent="AISensors"]
+collision_layer = 32
+collision_mask = 2
+
+[node name="LongDetectionCone" type="CollisionPolygon2D" parent="AISensors/LongDetectionConeArea2D"]
 polygon = PackedVector2Array(-200, 0, 65, -230, 365, -344, 1262, -622, 1665, 2, 755, 325, 365, 275, 55, 177)
 
-[node name="AlertRadius" type="CollisionShape2D" parent="AISensors"]
+[node name="ExclamationMark" type="Sprite2D" parent="AISensors"]
+visible = false
+position = Vector2(1.90735e-06, -125.875)
+scale = Vector2(0.0683594, 0.0683594)
+texture = ExtResource("3_gogp2")
+
+[node name="AlertRadiusArea2D" type="Area2D" parent="AISensors"]
+collision_layer = 32
+collision_mask = 2
+
+[node name="AlertRadius" type="CollisionShape2D" parent="AISensors/AlertRadiusArea2D"]
 scale = Vector2(150, 150)
 shape = SubResource("CircleShape2D_oaoow")

@@ -84,8 +84,13 @@ func stop_run() -> void :
 func move_and_slide() -> void :
 	if is_running:
 		get_parent().velocity.x = direction.x * run_speed
-	else:
-		get_parent().velocity.x = direction.x * get_parent().speed
+	else: 	
+		if direction != Vector2.ZERO: 
+			# Move in the direction set by the AI or player input
+			get_parent().velocity.x = direction.x * get_parent().speed
+		else:
+			# If no direction, stop horizontal movement
+			get_parent().velocity.x = 0
 	get_parent().move_and_slide()
 
 

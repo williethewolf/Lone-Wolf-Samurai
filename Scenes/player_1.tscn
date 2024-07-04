@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://c74jtlkki0up6"]
 
-[ext_resource type="Script" path="res://scripts/PlayerScripts/player1.gd" id="1_lfuv6"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/player.gd" id="1_qy0hg"]
 [ext_resource type="PackedScene" uid="uid://cqt46glfqb27s" path="res://Scenes/character.tscn" id="2_5y1v4"]
 [ext_resource type="Resource" uid="uid://4tmmfvtbfsu4" path="res://Scenes/player_1_controls.tres" id="3_vj0ox"]
 [ext_resource type="PackedScene" uid="uid://co8omo8pt3w8r" path="res://Scenes/StaminaCounter.tscn" id="4_w7stk"]
@@ -8,11 +8,12 @@
 [ext_resource type="PackedScene" uid="uid://b7i8cesh0sx6b" path="res://Scenes/ai_component.tscn" id="6_fxybo"]
 
 [node name="Player1" type="Node2D" groups=["Players"]]
-script = ExtResource("1_lfuv6")
+script = ExtResource("1_qy0hg")
 character_path = NodePath("character")
 controls = ExtResource("3_vj0ox")
 
 [node name="character" parent="." instance=ExtResource("2_5y1v4")]
+collision_mask = 35
 controls = ExtResource("3_vj0ox")
 
 [node name="StaminaCounter" parent="." instance=ExtResource("4_w7stk")]

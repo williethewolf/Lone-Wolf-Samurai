@@ -37,6 +37,7 @@ const Stance = preload("res://scripts/stanceEnum.gd").Stance
 #References to raycasts
 @onready var front_ray  : RayCast2D = $AnimatedSprite2DTorso/FrontRaycast
 @onready var back_ray  : RayCast2D = $AnimatedSprite2DTorso/BackRaycast
+@onready var attack_range  : CollisionShape2D = $AnimatedSprite2DTorso/AttackRange/AttackRangeCollider
 
 #Raycast flags
 var is_facing_right : bool = true
@@ -73,7 +74,9 @@ func _ready() -> void :
 	stamina_module.connect("stamina_changed", Callable(self, "_on_stamina_changed"))
 	stamina_module.connect("stamina_exhausted", Callable(self, "_on_stamina_exhausted"))
 	#stamina_module.connect("exhausted_changed", Callable(movement_module, "_on_exhausted_changed"))
-
+	#adjust speed so enemies are a bit slower
+	if is_ai_controlled:
+		speed *= 0.8
 
 func _physics_process(delta : float) -> void :
 	# Update movement module states

@@ -1,6 +1,6 @@
 [gd_scene load_steps=138 format=3 uid="uid://chld3bsqbwxv0"]
 
-[ext_resource type="Script" path="res://scripts/PlayerScripts/player1.gd" id="1_mu86a"]
+[ext_resource type="Script" path="res://scripts/PlayerScripts/player.gd" id="1_mu86a"]
 [ext_resource type="Texture2D" uid="uid://bivbhw5o6q1je" path="res://sprites/Character_sprites/original-6c34028201504126cddc7c4c73109ad7.jpg" id="2_vhrpb"]
 [ext_resource type="Texture2D" uid="uid://dg6s5tq4v3jgu" path="res://sprites/Character_sprites/original-e40c4da53db11cd0910b9ef95b76b45d.jpg" id="3_jhp3h"]
 [ext_resource type="Texture2D" uid="uid://doyi3d6qpcgm1" path="res://sprites/Character_sprites/legs idle_sheet.png" id="4_62wef"]

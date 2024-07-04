@@ -116,7 +116,7 @@ func change_stance(new_stance: Stance) -> void:
 	unseathe_sword()
 	if new_stance in [Stance.LOW, Stance.TOP]:
 		is_midSwing_complete= false
-	emit_signal("stance_changed", new_stance)  # Emit signal for stance change
+	emit_signal("stance_changed",  stance_strings[new_stance])  # Emit signal for stance change
 	
 	# Reset stance button held states
 	reset_stance_button_states()

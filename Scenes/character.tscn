@@ -1,4 +1,4 @@
-[gd_scene load_steps=194 format=3 uid="uid://cqt46glfqb27s"]
+[gd_scene load_steps=195 format=3 uid="uid://cqt46glfqb27s"]
 
 [ext_resource type="Script" path="res://scripts/PlayerScripts/character.gd" id="1_o6lj8"]
 [ext_resource type="Texture2D" uid="uid://bivbhw5o6q1je" path="res://sprites/Character_sprites/original-6c34028201504126cddc7c4c73109ad7.jpg" id="2_43g35"]
@@ -901,6 +901,9 @@ size = Vector2(76.2923, 8.1364)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0r20q"]
 radius = 17.0
 height = 156.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jgiv1"]
+radius = 133.004
 
 [sub_resource type="Animation" id="Animation_w88dt"]
 length = 0.001
@@ -2063,8 +2066,7 @@ animation = &"idle_legs"
 [node name="AnimatedSprite2DTorso" type="AnimatedSprite2D" parent="."]
 position = Vector2(2, -14)
 sprite_frames = SubResource("SpriteFrames_k50ex")
-animation = &"attack3"
-frame = 5
+animation = &"attack2"
 
 [node name="SwordHitArea" type="Area2D" parent="AnimatedSprite2DTorso"]
 
@@ -2099,6 +2101,13 @@ remote_path = NodePath("..")
 
 [node name="AISensorsAnchorRemoteTransform" type="RemoteTransform2D" parent="AnimatedSprite2DTorso/AnchorPoint"]
 remote_path = NodePath("..")
+
+[node name="AttackRange" type="Area2D" parent="AnimatedSprite2DTorso"]
+collision_layer = 32
+collision_mask = 6
+
+[node name="AttackRangeCollider" type="CollisionShape2D" parent="AnimatedSprite2DTorso/AttackRange"]
+shape = SubResource("CircleShape2D_jgiv1")
 
 [node name="TorsoAnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

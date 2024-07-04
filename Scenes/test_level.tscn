@@ -636,7 +636,7 @@ sources/0 = SubResource("TileSetAtlasSource_pjx3a")
 [node name="Player1" parent="Players" instance=ExtResource("1_nvc63")]
 
 [node name="Player2" parent="Players" instance=ExtResource("2_citic")]
-position = Vector2(879, 12)
+position = Vector2(1917, 57)
 
 [node name="Map" type="Node2D" parent="."]
 

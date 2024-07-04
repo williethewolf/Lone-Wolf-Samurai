@@ -19,53 +19,61 @@ signal distance_to_floor(distance_to_floorline: float)
 @onready var multiplayer_camera: Node = get_node("SubViewportContainer3/SubViewport/MultiplayerCamera")
 @onready var multiplayer_viewport_container: Node = get_node("SubViewportContainer3")
 
+@export var single_player: bool = true
+
 func _ready() -> void:
 	floorLineCoords = floorLine.global_position
 	print("Floorline global position:", floorLineCoords)
-	# Gather players into a dictionary
-	populate_players()
-
-	# Set up remote transforms and signals
-	for node: Dictionary in players.values():
-		var remote_transform := RemoteTransform2D.new()
-		remote_transform.remote_path = node["camera"].get_path()
-		node["player"].get_node("character").add_child(remote_transform)
-		if node["player"].get_node("character").has_signal("grounded_updated"):
-			node["player"].get_node("character").connect("grounded_updated", Callable(node["camera"], "_on_grounded_updated"))
-		print("Connected grounded_updated signal for player", node["player"].get("player_number"))
-
-	# Sync viewports
-	if players.has(2):
-		players[2]["viewport"].world_2d = players[1]["viewport"].world_2d
-		print("Synchronized viewports for Player 2")
-
-func populate_players() -> void:
-	# Gather players into a dictionary
+	
+	# Gather players into a dictionary, and remove Player 2 if in single player mode
 	for player in get_tree().get_nodes_in_group("Players"):
 		var player_number: int = player.get("player_number")
-		print("Found player with number: " + str(player_number))
-
-		# Construct the correct path for the SubViewportContainer and SubViewport nodes
-		var sub_viewport_container_path := "HBoxContainer/SubViewportContainer" + str(player_number)
-		var sub_viewport_container := get_node(sub_viewport_container_path)
-		
-		if sub_viewport_container:
-			var viewport: Node = sub_viewport_container.get_node("SubViewport")
-			var camera: Node = viewport.get_node("Player" + str(player_number) + "Camera")
-			
-			# Add the player information to the dictionary
-			players[player_number] = {
-				"viewport": viewport,
-				"sub_viewport_container": sub_viewport_container,
-				"camera": camera,
-				"player": player
-			}
-			print("Initialized player", player_number, "with camera", camera.name)
+		if single_player and player_number == 2:
+			player.queue_free()
+			print("Removed player 2")
 		else:
-			print("SubViewportContainer not found for player " + str(player_number))
+			populate_player(player)
+
+	if not single_player:
+		# Set up remote transforms and signals for multiplayer
+		for node: Dictionary in players.values():
+			var remote_transform := RemoteTransform2D.new()
+			remote_transform.remote_path = node["camera"].get_path()
+			node["player"].get_node("character").add_child(remote_transform)
+			if node["player"].get_node("character").has_signal("grounded_updated"):
+				node["player"].get_node("character").connect("grounded_updated", Callable(node["camera"], "_on_grounded_updated"))
+			print("Connected grounded_updated signal for player", node["player"].get("player_number"))
+
+		# Sync viewports
+		if players.has(2):
+			players[2]["viewport"].world_2d = players[1]["viewport"].world_2d
+			print("Synchronized viewports for Player 2")
+
+func populate_player(player: Node) -> void:
+	var player_number: int = player.get("player_number")
+	print("Found player with number: " + str(player_number))
+
+	# Construct the correct path for the SubViewportContainer and SubViewport nodes
+	var sub_viewport_container_path := "HBoxContainer/SubViewportContainer" + str(player_number)
+	var sub_viewport_container := get_node(sub_viewport_container_path)
+	
+	if sub_viewport_container:
+		var viewport: Node = sub_viewport_container.get_node("SubViewport")
+		var camera: Node = viewport.get_node("Player" + str(player_number) + "Camera")
+		
+		# Add the player information to the dictionary
+		players[player_number] = {
+			"viewport": viewport,
+			"sub_viewport_container": sub_viewport_container,
+			"camera": camera,
+			"player": player
+		}
+		print("Initialized player", player_number, "with camera", camera.name)
+	else:
+		print("SubViewportContainer not found for player " + str(player_number))
 
 func _physics_process(_delta: float) -> void:
-	if players.has(1) and players.has(2):
+	if players.has(1) and players.has(2) and not single_player:
 		var player1_pos: Vector2
 		var player2_pos: Vector2
 		
