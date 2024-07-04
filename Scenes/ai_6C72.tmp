@@ -9,6 +9,8 @@ radius = 8.0
 
 [node name="AIComponent" type="Node"]
 script = ExtResource("1_jic41")
+character_path = null
+difficulty_level = null
 
 [node name="AISensors" type="Node2D" parent="."]
 script = ExtResource("2_bt5t5")

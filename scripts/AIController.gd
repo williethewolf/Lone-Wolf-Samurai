@@ -48,12 +48,27 @@ var confidence: float = 0.0
 enum AIState {
 	IDLE,
 	MOVING,
+	CHASING,
+	FOOTWORK,
 	ATTACKING,
 	BLOCKING,
 	ALERTED,
 	ENGAGED,
 	FLEEING,
 }
+#for debugging
+var AIstates_strings: Dictionary = {
+	AIState.IDLE : "IDLE",
+	AIState.MOVING : "MOVING",
+	AIState.CHASING : "CHASING",
+	AIState.ATTACKING : "ATTACKING",
+	AIState.BLOCKING : "BLOCKING",
+	AIState.ALERTED : "ALERTED",
+	AIState.ENGAGED : "ENGAGED",
+	AIState.FLEEING : "FLEEING"
+}
+
+var in_attacking_range : bool = false
 
 # Enums for stances
 const Stance = preload("res://scripts/stanceEnum.gd").Stance
@@ -108,17 +123,22 @@ func _physics_process(delta: float) -> void:
 		
 		# Add AI movement or other logic here
 		if target_character:
-			# How to fight with player in range
-			execute_ai_combat_logic()
+			if in_attacking_range:
+				# How to fight with player in range
+				movement_module.direction = Vector2.ZERO
+				execute_ai_combat_logic()
+			else:
+				# How to act when not in range
+				if state == AIState.CHASING or AIState.IDLE:
+					move_towards_target(delta)
+				#else:
+				#	movement_module.direction = Vector2.ZERO  
 		else:
-			# How to act when not in range
+			# Default behavior when no target is set
 			ai_behavior()
-		if state == AIState.MOVING:
-			move_towards_target(delta)
-		else:
-			movement_module.direction = Vector2.ZERO  # Ensure AI stops when not moving
 	else:
 		print("Character is not valid in _physics_process")
+	print(AIstates_strings[state])
 
 func handle_detection(delta: float) -> void:
 	# Check for nearby enemies
@@ -172,15 +192,20 @@ func _on_far_view_cone_exited(body: Node) -> void:
 
 #Close combat detection
 func _on_attack_range_entered(body: Node) -> void:
-	if body.get_parent().is_in_group("Players") and body.get_node("character") == target_character:
+	body = body.get_parent()
+	if body.is_in_group("Players") and body.get_node("character") == target_character:
+		in_attacking_range = true
 		state = AIState.IDLE
 		character.velocity = Vector2.ZERO
 		print("In attack range of player, stopping")
 		
 func _on_attack_range_exited(body: Node) -> void:
-	if body.get_parent().is_in_group("Players") and body.get_node("character") == target_character:
-		state = AIState.MOVING
+	body = body.get_parent()
+	if body.is_in_group("Players") and body.get_node("character") == target_character:
+		in_attacking_range = false
+		state = AIState.CHASING
 		print("Player exited attack range, resuming chase")
+		emit_signal("attack_range_exited", body)
 		
 #Alert RADIUS
 func _on_alert_radius_entered(body: Node) -> void:
@@ -205,7 +230,7 @@ func start_detection_timer(delta: float) -> void:
 func _on_alerted() -> void:
 	print("AI is alerted!")
 	target_character = find_closest_player()
-	state = AIState.MOVING  # Set state to MOVING to start approaching the player
+	state = AIState.CHASING  # Set state to CHASING to start approaching the player
 	print("Chasing player!")
 	# Add additional alert behavior if needed
 
@@ -250,8 +275,9 @@ func move_towards_target(delta: float) -> void:
 		var horizontal_distance: float = abs(character.global_position.x - target_character.global_position.x)
 
 		# Stop moving if the enemy is close enough to the player horizontally
-		if horizontal_distance < 5.0:
+		if horizontal_distance < 85.0:
 			movement_module.direction = Vector2.ZERO
+			state = AIState.IDLE
 		else:
 			# Update the movement module direction for horizontal movement
 			if direction.x > 0:
@@ -259,7 +285,7 @@ func move_towards_target(delta: float) -> void:
 			else:
 				movement_module.direction = movement_module.LEFT
 
-		state = AIState.MOVING
+		state = AIState.CHASING
 	
 func execute_ai_combat_logic() -> void:
 	match state:
